@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ===== LIGHT MODE (Default) ===== */
+    --background: 270 30% 97%;
+    --foreground: 270 50% 10%;
+
+    --card: 270 20% 94%;
+    --card-foreground: 270 50% 10%;
+
+    --popover: 270 20% 94%;
+    --popover-foreground: 270 50% 10%;
+
+    --primary: 276 80% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 270 20% 90%;
+    --secondary-foreground: 270 50% 15%;
+
+    --muted: 270 15% 92%;
+    --muted-foreground: 270 15% 45%;
+
+    --accent: 145 50% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 80% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 270 20% 85%;
+    --input: 270 20% 85%;
+    --ring: 276 80% 50%;
+
+    --radius: 0.75rem;
+
+    --primary-glow: 276 100% 60%;
+    --primary-deep: 276 100% 30%;
+    --success: 145 50% 45%;
+  }
+
+  .dark {
+    /* ===== DARK MODE ===== */
+    --background: 270 50% 5%;
+    --foreground: 0 0% 95%;
+
+    --card: 270 35% 10%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 270 35% 10%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 276 100% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 270 20% 15%;
+    --secondary-foreground: 0 0% 95%;
+
+    --muted: 270 20% 15%;
+    --muted-foreground: 270 15% 55%;
+
+    --accent: 145 63% 49%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 80% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 276 50% 25%;
+    --input: 276 50% 25%;
+    --ring: 276 100% 50%;
+
+    --primary-glow: 276 100% 60%;
+    --primary-deep: 276 100% 30%;
+    --success: 145 63% 49%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: "Exo 2", system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Orbitron", system-ui, sans-serif;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-[hsl(var(--primary-glow))];
+  }
+
+  .glow {
+    box-shadow: 0 0 20px -5px hsl(var(--primary-glow) / 0.35);
+  }
+
+  .glow-lg {
+    box-shadow: 0 0 40px -10px hsl(var(--primary-glow) / 0.45);
+  }
+}
