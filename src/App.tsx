@@ -8,6 +8,8 @@ import BuyerDashboard from "./pages/buyer/Dashboard"
 import RequestDetails from "./pages/buyer/RequestDetails"
 import VendorDashboard from "./pages/vendor/Dashboard"
 import AdminScoping from "./pages/admin/Scoping"
+import TermsOfService from "./pages/TermsOfService"
+import PrivacyPolicy from "./pages/PrivacyPolicy"
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
         <Route path="/quote-audit" element={<QuoteAudit />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
 
         {/* Buyer */}
         <Route path="/buyer" element={<BuyerDashboard />} />
