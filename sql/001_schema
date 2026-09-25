@@ -1,0 +1,806 @@
+-- =====================================================
+-- PLATFORM: Independent B2B Tech Procurement Desk
+-- Database Schema - Production Ready + High Scalability
+-- Target: Supabase (PostgreSQL 15+)
+-- Version: 2.1 (Corrected)
+-- =====================================================
+
+-- Extensions
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- =====================================================
+-- 0. NATIVE UUIDv7 GENERATOR (Time-ordered - Recommended)
+-- =====================================================
+CREATE OR REPLACE FUNCTION public.generate_uuid_v7()
+RETURNS UUID
+LANGUAGE plpgsql
+VOLATILE
+PARALLEL SAFE
+AS $$
+DECLARE
+  unix_ts_ms BYTEA;
+  uuid_bytes BYTEA;
+BEGIN
+  unix_ts_ms := substring(int8send(floor(extract(epoch from clock_timestamp()) * 1000)::bigint) from 3);
+  uuid_bytes := unix_ts_ms || gen_random_bytes(10);
+  -- set version to 7
+  uuid_bytes := set_byte(uuid_bytes, 6, (get_byte(uuid_bytes, 6) & 15) | 112);
+  -- set variant to RFC 4122
+  uuid_bytes := set_byte(uuid_bytes, 8, (get_byte(uuid_bytes, 8) & 63) | 128);
+  RETURN encode(uuid_bytes, 'hex')::uuid;
+END;
+$$;
+
+-- =====================================================
+-- 1. ENUMS
+-- =====================================================
+CREATE TYPE user_role AS ENUM (
+  'platform_admin',
+  'buyer_admin',
+  'buyer_member',
+  'vendor_admin',
+  'vendor_member',
+  'viewer'
+);
+
+CREATE TYPE org_type AS ENUM ('buyer', 'vendor', 'both');
+
+CREATE TYPE request_status AS ENUM (
+  'draft',
+  'submitted',
+  'under_review',
+  'scoping',
+  'rfq_sent',
+  'proposals_received',
+  'shortlisted',
+  'negotiation',
+  'won',
+  'lost',
+  'cancelled',
+  'archived'
+);
+
+CREATE TYPE proposal_status AS ENUM (
+  'draft',
+  'submitted',
+  'under_review',
+  'shortlisted',
+  'rejected',
+  'accepted',
+  'withdrawn'
+);
+
+CREATE TYPE deal_status AS ENUM (
+  'pending_signature',
+  'active',
+  'completed',
+  'cancelled',
+  'disputed'
+);
+
+CREATE TYPE commission_status AS ENUM (
+  'pending',
+  'invoiced',
+  'paid',
+  'waived',
+  'disputed'
+);
+
+CREATE TYPE quote_audit_status AS ENUM (
+  'submitted',
+  'in_review',
+  'completed',
+  'archived'
+);
+
+CREATE TYPE company_size AS ENUM (
+  '1-10',
+  '11-50',
+  '51-200',
+  '201-500',
+  '501-1000',
+  '1001-5000',
+  '5000+'
+);
+
+CREATE TYPE rfq_status AS ENUM (
+  'open',
+  'closed',
+  'awarded',
+  'cancelled'
+);
+
+CREATE TYPE invitation_status AS ENUM (
+  'invited',
+  'viewed',
+  'declined',
+  'submitted'
+);
+
+-- =====================================================
+-- 2. CORE TABLES
+-- =====================================================
+
+-- Profiles (extends auth.users)
+CREATE TABLE public.profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  email TEXT,
+  full_name TEXT,
+  phone TEXT,
+  avatar_url TEXT,
+  role user_role NOT NULL DEFAULT 'viewer',
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  last_seen_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Organizations (Buyers & Vendors)
+CREATE TABLE public.organizations (
+  id UUID PRIMARY KEY DEFAULT public.generate_uuid_v7(),
+  name TEXT NOT NULL,
+  legal_name TEXT,
+  type org_type NOT NULL,
+  country_code CHAR(2),
+  city TEXT,
+  website TEXT,
+  logo_url TEXT,
+  description TEXT,
+  company_size company_size,
+  annual_revenue_range TEXT,
+  tax_id TEXT,
+  is_verified BOOLEAN NOT NULL DEFAULT false,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  metadata JSONB DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ
+);
+
+CREATE INDEX idx_organizations_type ON public.organizations(type);
+CREATE INDEX idx_organizations_active ON public.organizations(is_active) WHERE deleted_at IS NULL;
+CREATE INDEX idx_organizations_country ON public.organizations(country_code);
+
+-- Organization Members
+CREATE TABLE public.organization_members (
+  id UUID PRIMARY KEY DEFAULT public.generate_uuid_v7(),
+  organization_id UUID NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  role user_role NOT NULL DEFAULT 'buyer_member',
+  is_primary BOOLEAN NOT NULL DEFAULT false,
+  joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (organization_id, user_id)
+);
+
+CREATE INDEX idx_org_members_user ON public.organization_members(user_id);
+CREATE INDEX idx_org_members_org ON public.organization_members(organization_id);
+
+-- =====================================================
+-- 3. VENDOR PROFILES & MATCHING METADATA
+-- =====================================================
+CREATE TABLE public.vendor_profiles (
+  id UUID PRIMARY KEY DEFAULT public.generate_uuid_v7(),
+  organization_id UUID NOT NULL UNIQUE REFERENCES public.organizations(id) ON DELETE CASCADE,
+
+  -- Technical Specializations
+  specialties TEXT[] DEFAULT '{}',
+  technologies TEXT[] DEFAULT '{}',
+  industries_served TEXT[] DEFAULT '{}',
+  geo_coverage TEXT[] DEFAULT '{}',
+  team_size INTEGER,
+  years_in_business INTEGER,
+
+  -- Capacity & Financials
+  min_project_budget NUMERIC(14,2),
+  max_concurrent_projects INTEGER,
+  average_project_duration_days INTEGER,
+
+  -- Validation & Credibility
+  portfolio_urls TEXT[] DEFAULT '{}',
+  case_studies JSONB DEFAULT '[]'::jsonb,
+  certifications TEXT[] DEFAULT '{}',
+  preferred_engagement_models TEXT[] DEFAULT '{}',
+
+  -- Scoring & Metrics
+  platform_score NUMERIC(5,2) DEFAULT 0,
+  success_rate NUMERIC(5,2),
+  average_rating NUMERIC(3,2),
+  total_deals_closed INTEGER DEFAULT 0,
+
+  -- Subscription & Monetization
+  is_certified_partner BOOLEAN NOT NULL DEFAULT false,
+  subscription_plan TEXT DEFAULT 'free',
+  subscription_starts_at TIMESTAMPTZ,
+  subscription_ends_at TIMESTAMPTZ,
+
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- GIN Indexes for high-performance matching
+CREATE INDEX idx_vendor_specialties_gin ON public.vendor_profiles USING GIN (specialties);
+CREATE INDEX idx_vendor_technologies_gin ON public.vendor_profiles USING GIN (technologies);
+CREATE INDEX idx_vendor_industries_gin ON public.vendor_profiles USING GIN (industries_served);
+CREATE INDEX idx_vendor_geo_gin ON public.vendor_profiles USING GIN (geo_coverage);
+
+-- =====================================================
+-- 4. PROJECT REQUESTS / INTAKE
+-- =====================================================
+CREATE TABLE public.project_requests (
+  id UUID PRIMARY KEY DEFAULT public.generate_uuid_v7(),
+  buyer_organization_id UUID NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
+  created_by UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+
+  title TEXT,
+  description_text TEXT,
+  voice_recording_url TEXT,
+  voice_transcript TEXT,
+
+  company_size company_size,
+  timeline TEXT,
+  budget_min NUMERIC(14,2),
+  budget_max NUMERIC(14,2),
+  currency CHAR(3) DEFAULT 'USD',
+
+  current_systems TEXT[],
+  main_pain_points TEXT[],
+  success_metrics TEXT[],
+
+  status request_status NOT NULL DEFAULT 'draft',
+  priority INTEGER DEFAULT 3 CHECK (priority BETWEEN 1 AND 5),
+
+  assigned_to UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  internal_notes TEXT,
+  scoring_data JSONB DEFAULT '{}'::jsonb,
+
+  submitted_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  deleted_at TIMESTAMPTZ,
+
+  CONSTRAINT check_budget_range CHECK (
+    budget_min IS NULL OR budget_max IS NULL OR budget_min <= budget_max
+  )
+);
+
+CREATE INDEX idx_project_requests_buyer ON public.project_requests(buyer_organization_id);
+CREATE INDEX idx_project_requests_status ON public.project_requests(status);
+CREATE INDEX idx_project_requests_created ON public.project_requests(created_at DESC);
+CREATE INDEX idx_project_requests_assigned ON public.project_requests(assigned_to) WHERE assigned_to IS NOT NULL;
+CREATE INDEX idx_project_requests_not_deleted ON public.project_requests(id) WHERE deleted_at IS NULL;
+
+-- =====================================================
+-- 5. SCOPE DOCUMENTS
+-- =====================================================
+CREATE TABLE public.scope_documents (
+  id UUID PRIMARY KEY DEFAULT public.generate_uuid_v7(),
+  request_id UUID NOT NULL UNIQUE REFERENCES public.project_requests(id) ON DELETE CASCADE,
+
+  version INTEGER NOT NULL DEFAULT 1,
+  title TEXT NOT NULL,
+
+  objectives TEXT[],
+  functional_requirements JSONB DEFAULT '[]'::jsonb,
+  non_functional_requirements JSONB DEFAULT '[]'::jsonb,
+  technical_constraints JSONB DEFAULT '{}'::jsonb,
+  integrations_required TEXT[],
+  out_of_scope TEXT[],
+  assumptions TEXT[],
+  acceptance_criteria TEXT[],
+
+  estimated_budget_range NUMRANGE,
+  preferred_timeline_days INTEGER,
+
+  full_document_url TEXT,
+  raw_content JSONB,
+
+  created_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- =====================================================
+-- 6. RFQ SYSTEM (Anonymous)
+-- =====================================================
+CREATE TABLE public.rfqs (
+  id UUID PRIMARY KEY DEFAULT public.generate_uuid_v7(),
+  request_id UUID NOT NULL REFERENCES public.project_requests(id) ON DELETE CASCADE,
+  scope_document_id UUID NOT NULL REFERENCES public.scope_documents(id) ON DELETE CASCADE,
+
+  title TEXT NOT NULL,
+  anonymous_code TEXT NOT NULL,
+  status rfq_status NOT NULL DEFAULT 'open',
+
+  deadline_at TIMESTAMPTZ,
+  max_proposals INTEGER DEFAULT 8,
+
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  closed_at TIMESTAMPTZ
+);
+
+CREATE UNIQUE INDEX idx_rfqs_anonymous_code ON public.rfqs(anonymous_code);
+CREATE INDEX idx_rfqs_status ON public.rfqs(status);
+
+CREATE TABLE public.rfq_invitations (
+  id UUID PRIMARY KEY DEFAULT public.generate_uuid_v7(),
+  rfq_id UUID NOT NULL REFERENCES public.rfqs(id) ON DELETE CASCADE,
+  vendor_organization_id UUID NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
+
+  invited_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  viewed_at TIMESTAMPTZ,
+  status invitation_status NOT NULL DEFAULT 'invited',
+
+  UNIQUE (rfq_id, vendor_organization_id)
+);
+
+CREATE INDEX idx_rfq_invitations_vendor ON public.rfq_invitations(vendor_organization_id);
+CREATE INDEX idx_rfq_invitations_rfq ON public.rfq_invitations(rfq_id);
+CREATE INDEX idx_rfq_invitations_status ON public.rfq_invitations(status);
+
+-- =====================================================
+-- 7. PROPOSALS (Blind Bids)
+-- =====================================================
+CREATE TABLE public.proposals (
+  id UUID PRIMARY KEY DEFAULT public.generate_uuid_v7(),
+  rfq_id UUID NOT NULL REFERENCES public.rfqs(id) ON DELETE CASCADE,
+  vendor_organization_id UUID NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
+  submitted_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+
+  status proposal_status NOT NULL DEFAULT 'draft',
+
+  total_price NUMERIC(14,2) NOT NULL CHECK (total_price >= 0),
+  currency CHAR(3) DEFAULT 'USD',
+  pricing_model TEXT,
+  payment_terms TEXT,
+  estimated_duration_days INTEGER,
+
+  technical_approach TEXT,
+  team_composition JSONB DEFAULT '[]'::jsonb,
+  timeline_milestones JSONB DEFAULT '[]'::jsonb,
+  assumptions TEXT[],
+  exclusions TEXT[],
+
+  proposal_document_url TEXT,
+  additional_files JSONB DEFAULT '[]'::jsonb,
+
+  platform_score NUMERIC(5,2),
+  evaluation_notes TEXT,
+
+  submitted_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+  UNIQUE (rfq_id, vendor_organization_id)
+);
+
+CREATE INDEX idx_proposals_rfq ON public.proposals(rfq_id);
+CREATE INDEX idx_proposals_vendor ON public.proposals(vendor_organization_id);
+CREATE INDEX idx_proposals_status ON public.proposals(status);
+CREATE INDEX idx_proposals_submitted ON public.proposals(submitted_at DESC) WHERE status = 'submitted';
+
+-- =====================================================
+-- 8. SHORTLISTS
+-- =====================================================
+CREATE TABLE public.shortlists (
+  id UUID PRIMARY KEY DEFAULT public.generate_uuid_v7(),
+  request_id UUID NOT NULL REFERENCES public.project_requests(id) ON DELETE CASCADE,
+  proposal_id UUID NOT NULL REFERENCES public.proposals(id) ON DELETE CASCADE,
+
+  rank INTEGER CHECK (rank BETWEEN 1 AND 10),
+  platform_recommendation_reason TEXT,
+  buyer_notes TEXT,
+
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (request_id, proposal_id)
+);
+
+CREATE INDEX idx_shortlists_request ON public.shortlists(request_id);
+
+-- =====================================================
+-- 9. DEALS & COMMISSIONS
+-- =====================================================
+CREATE TABLE public.deals (
+  id UUID PRIMARY KEY DEFAULT public.generate_uuid_v7(),
+  request_id UUID NOT NULL REFERENCES public.project_requests(id) ON DELETE CASCADE,
+  proposal_id UUID NOT NULL REFERENCES public.proposals(id) ON DELETE CASCADE,
+  buyer_organization_id UUID NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
+  vendor_organization_id UUID NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
+
+  status deal_status NOT NULL DEFAULT 'pending_signature',
+  final_amount NUMERIC(14,2) NOT NULL CHECK (final_amount >= 0),
+  currency CHAR(3) DEFAULT 'USD',
+
+  signed_at TIMESTAMPTZ,
+  start_date DATE,
+  expected_end_date DATE,
+  actual_end_date DATE,
+
+  contract_url TEXT,
+
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_deals_buyer ON public.deals(buyer_organization_id);
+CREATE INDEX idx_deals_vendor ON public.deals(vendor_organization_id);
+CREATE INDEX idx_deals_status ON public.deals(status);
+
+CREATE TABLE public.commissions (
+  id UUID PRIMARY KEY DEFAULT public.generate_uuid_v7(),
+  deal_id UUID NOT NULL REFERENCES public.deals(id) ON DELETE CASCADE,
+  vendor_organization_id UUID NOT NULL REFERENCES public.organizations(id) ON DELETE CASCADE,
+
+  deal_amount NUMERIC(14,2) NOT NULL,
+  commission_rate NUMERIC(5,4) NOT NULL CHECK (commission_rate >= 0 AND commission_rate <= 1),
+  commission_amount NUMERIC(14,2) NOT NULL,
+
+  status commission_status NOT NULL DEFAULT 'pending',
+  invoice_url TEXT,
+  paid_at TIMESTAMPTZ,
+
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_commissions_vendor ON public.commissions(vendor_organization_id);
+CREATE INDEX idx_commissions_status ON public.commissions(status);
+
+-- =====================================================
+-- 10. QUOTE AUDIT (Acquisition Feature)
+-- =====================================================
+CREATE TABLE public.quote_audits (
+  id UUID PRIMARY KEY DEFAULT public.generate_uuid_v7(),
+  buyer_organization_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE,
+  created_by UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+
+  original_quote_url TEXT,
+  original_quote_text TEXT,
+  vendor_name_mentioned TEXT,
+  quoted_amount NUMERIC(14,2),
+  currency CHAR(3) DEFAULT 'USD',
+
+  project_description TEXT,
+  voice_recording_url TEXT,
+
+  status quote_audit_status NOT NULL DEFAULT 'submitted',
+
+  audit_result JSONB,
+  recommended_action TEXT,
+  auditor_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  completed_at TIMESTAMPTZ,
+
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_quote_audits_status ON public.quote_audits(status);
+CREATE INDEX idx_quote_audits_buyer ON public.quote_audits(buyer_organization_id);
+
+-- =====================================================
+-- 11. TAXONOMIES
+-- =====================================================
+CREATE TABLE public.categories (
+  id UUID PRIMARY KEY DEFAULT public.generate_uuid_v7(),
+  name TEXT NOT NULL UNIQUE,
+  slug TEXT NOT NULL UNIQUE,
+  parent_id UUID REFERENCES public.categories(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE public.vendor_categories (
+  vendor_profile_id UUID NOT NULL REFERENCES public.vendor_profiles(id) ON DELETE CASCADE,
+  category_id UUID NOT NULL REFERENCES public.categories(id) ON DELETE CASCADE,
+  PRIMARY KEY (vendor_profile_id, category_id)
+);
+
+-- =====================================================
+-- 12. HIGH-SCALE LOGS & NOTIFICATIONS
+-- =====================================================
+
+-- Partitioned Activity Logs
+CREATE TABLE public.activity_logs (
+  id UUID NOT NULL DEFAULT public.generate_uuid_v7(),
+  actor_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  organization_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE,
+  entity_type TEXT NOT NULL,
+  entity_id UUID NOT NULL,
+  action TEXT NOT NULL,
+  metadata JSONB DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (id, created_at)
+) PARTITION BY RANGE (created_at);
+
+-- Example partitions for 2026 (create more as needed)
+CREATE TABLE public.activity_logs_2026_q1 PARTITION OF public.activity_logs
+  FOR VALUES FROM ('2026-01-01') TO ('2026-04-01');
+CREATE TABLE public.activity_logs_2026_q2 PARTITION OF public.activity_logs
+  FOR VALUES FROM ('2026-04-01') TO ('2026-07-01');
+CREATE TABLE public.activity_logs_2026_q3 PARTITION OF public.activity_logs
+  FOR VALUES FROM ('2026-07-01') TO ('2026-10-01');
+CREATE TABLE public.activity_logs_2026_q4 PARTITION OF public.activity_logs
+  FOR VALUES FROM ('2026-10-01') TO ('2027-01-01');
+
+CREATE INDEX idx_activity_logs_entity ON public.activity_logs (entity_type, entity_id);
+CREATE INDEX idx_activity_logs_created ON public.activity_logs (created_at DESC);
+
+-- Notifications
+CREATE TABLE public.notifications (
+  id UUID PRIMARY KEY DEFAULT public.generate_uuid_v7(),
+  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  body TEXT,
+  link TEXT,
+  is_read BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_notifications_user ON public.notifications (user_id, is_read);
+
+-- =====================================================
+-- 13. UPDATED_AT TRIGGER
+-- =====================================================
+CREATE OR REPLACE FUNCTION public.handle_updated_at()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.organizations
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.vendor_profiles
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.project_requests
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.scope_documents
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.proposals
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.deals
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.commissions
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.quote_audits
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+
+-- =====================================================
+-- 14. HELPER FUNCTIONS FOR RLS
+-- =====================================================
+CREATE OR REPLACE FUNCTION public.is_platform_admin()
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE id = auth.uid() AND role = 'platform_admin' AND is_active = true
+  );
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_member_of_org(org_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.organization_members
+    WHERE organization_id = org_id AND user_id = auth.uid()
+  );
+$$;
+
+CREATE OR REPLACE FUNCTION public.get_user_org_ids()
+RETURNS SETOF UUID
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT organization_id FROM public.organization_members
+  WHERE user_id = auth.uid();
+$$;
+
+-- =====================================================
+-- 15. ROW LEVEL SECURITY
+-- =====================================================
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.organizations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.organization_members ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.vendor_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.project_requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.scope_documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.rfqs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.rfq_invitations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.proposals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.shortlists ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.deals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.commissions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.quote_audits ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.activity_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.vendor_categories ENABLE ROW LEVEL SECURITY;
+
+-- Profiles
+CREATE POLICY "Users can view own profile"
+  ON public.profiles FOR SELECT
+  USING (auth.uid() = id OR public.is_platform_admin());
+
+CREATE POLICY "Users can update own profile"
+  ON public.profiles FOR UPDATE
+  USING (auth.uid() = id);
+
+-- Organizations
+CREATE POLICY "Members can view their organizations"
+  ON public.organizations FOR SELECT
+  USING (
+    public.is_platform_admin()
+    OR id IN (SELECT public.get_user_org_ids())
+  );
+
+CREATE POLICY "Platform admin full access on organizations"
+  ON public.organizations FOR ALL
+  USING (public.is_platform_admin());
+
+-- Organization Members
+CREATE POLICY "Members can view org members"
+  ON public.organization_members FOR SELECT
+  USING (
+    public.is_platform_admin()
+    OR organization_id IN (SELECT public.get_user_org_ids())
+  );
+
+-- Vendor Profiles
+CREATE POLICY "Vendors can manage own profile"
+  ON public.vendor_profiles FOR ALL
+  USING (
+    public.is_platform_admin()
+    OR organization_id IN (SELECT public.get_user_org_ids())
+  );
+
+CREATE POLICY "Authenticated users can view vendor profiles (for matching)"
+  ON public.vendor_profiles FOR SELECT
+  USING (auth.role() = 'authenticated');
+
+-- Project Requests
+CREATE POLICY "Buyers can manage their requests"
+  ON public.project_requests FOR ALL
+  USING (
+    public.is_platform_admin()
+    OR buyer_organization_id IN (SELECT public.get_user_org_ids())
+  );
+
+-- Scope Documents
+CREATE POLICY "Access scope via request ownership"
+  ON public.scope_documents FOR ALL
+  USING (
+    public.is_platform_admin()
+    OR request_id IN (
+      SELECT id FROM public.project_requests
+      WHERE buyer_organization_id IN (SELECT public.get_user_org_ids())
+    )
+  );
+
+-- RFQs
+CREATE POLICY "Platform and related parties can view RFQs"
+  ON public.rfqs FOR SELECT
+  USING (
+    public.is_platform_admin()
+    OR request_id IN (
+      SELECT id FROM public.project_requests
+      WHERE buyer_organization_id IN (SELECT public.get_user_org_ids())
+    )
+    OR id IN (
+      SELECT rfq_id FROM public.rfq_invitations
+      WHERE vendor_organization_id IN (SELECT public.get_user_org_ids())
+    )
+  );
+
+-- RFQ Invitations
+CREATE POLICY "Vendors see their invitations"
+  ON public.rfq_invitations FOR SELECT
+  USING (
+    public.is_platform_admin()
+    OR vendor_organization_id IN (SELECT public.get_user_org_ids())
+  );
+
+-- Proposals
+CREATE POLICY "Vendors manage their proposals"
+  ON public.proposals FOR ALL
+  USING (
+    public.is_platform_admin()
+    OR vendor_organization_id IN (SELECT public.get_user_org_ids())
+  );
+
+CREATE POLICY "Buyers can view shortlisted/accepted proposals"
+  ON public.proposals FOR SELECT
+  USING (
+    public.is_platform_admin()
+    OR (
+      status IN ('shortlisted', 'accepted')
+      AND rfq_id IN (
+        SELECT r.id FROM public.rfqs r
+        JOIN public.project_requests pr ON pr.id = r.request_id
+        WHERE pr.buyer_organization_id IN (SELECT public.get_user_org_ids())
+      )
+    )
+  );
+
+-- Shortlists
+CREATE POLICY "Buyers and platform can manage shortlists"
+  ON public.shortlists FOR ALL
+  USING (
+    public.is_platform_admin()
+    OR request_id IN (
+      SELECT id FROM public.project_requests
+      WHERE buyer_organization_id IN (SELECT public.get_user_org_ids())
+    )
+  );
+
+-- Deals
+CREATE POLICY "Parties can view their deals"
+  ON public.deals FOR SELECT
+  USING (
+    public.is_platform_admin()
+    OR buyer_organization_id IN (SELECT public.get_user_org_ids())
+    OR vendor_organization_id IN (SELECT public.get_user_org_ids())
+  );
+
+-- Commissions
+CREATE POLICY "Vendors and platform can view commissions"
+  ON public.commissions FOR SELECT
+  USING (
+    public.is_platform_admin()
+    OR vendor_organization_id IN (SELECT public.get_user_org_ids())
+  );
+
+-- Quote Audits
+CREATE POLICY "Buyers manage their audits"
+  ON public.quote_audits FOR ALL
+  USING (
+    public.is_platform_admin()
+    OR buyer_organization_id IN (SELECT public.get_user_org_ids())
+    OR created_by = auth.uid()
+  );
+
+-- Notifications
+CREATE POLICY "Users manage own notifications"
+  ON public.notifications FOR ALL
+  USING (user_id = auth.uid() OR public.is_platform_admin());
+
+-- Categories (public read)
+CREATE POLICY "Anyone can read categories"
+  ON public.categories FOR SELECT
+  USING (true);
+
+CREATE POLICY "Platform admin manages categories"
+  ON public.categories FOR ALL
+  USING (public.is_platform_admin());
+
+-- Activity Logs (platform only for now)
+CREATE POLICY "Platform admin can view activity logs"
+  ON public.activity_logs FOR SELECT
+  USING (public.is_platform_admin());
+-- Platform admins can do everything (you will create a helper function)
+-- For now, keep policies simple and tighten later.
+
+-- =====================================================
+-- 14. STORAGE BUCKETS (run in Supabase Dashboard or SQL)
+-- =====================================================
+
+-- You should create these buckets in Supabase Storage:
+-- 1. voice-recordings (private)
+-- 2. scope-documents (private)
+-- 3. proposals (private)
+-- 4. contracts (private)
+-- 5. quote-audits (private)
+-- 6. avatars (public)
+-- 7. logos (public)
