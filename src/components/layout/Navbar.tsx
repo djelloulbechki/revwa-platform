@@ -51,14 +51,6 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-<<<<<<< Updated upstream
-          <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
-            <Link to="/login">Sign In</Link>
-          </Button>
-          <Button asChild size="sm" className="hidden sm:inline-flex">
-            <Link to="/signup">Get Started</Link>
-          </Button>
-=======
           {!loading && (
             <>
               {user ? (
@@ -86,7 +78,6 @@ export function Navbar() {
               )}
             </>
           )}
->>>>>>> Stashed changes
           <Button
             variant="ghost"
             size="icon"
@@ -112,14 +103,6 @@ export function Navbar() {
             </>
           )}
           <div className="flex gap-2 pt-2">
-<<<<<<< Updated upstream
-            <Button asChild variant="outline" size="sm" className="flex-1">
-              <Link to="/login" onClick={() => setOpen(false)}>Sign In</Link>
-            </Button>
-            <Button asChild size="sm" className="flex-1">
-              <Link to="/signup" onClick={() => setOpen(false)}>Get Started</Link>
-            </Button>
-=======
             {user ? (
               <Button variant="outline" size="sm" className="flex-1" onClick={() => { handleSignOut(); setOpen(false) }}>
                 Sign out
@@ -134,7 +117,6 @@ export function Navbar() {
                 </Button>
               </>
             )}
->>>>>>> Stashed changes
           </div>
         </div>
       )}
