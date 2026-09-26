@@ -1,11 +1,17 @@
 import { useState, useRef } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Navbar } from "@/components/layout/Navbar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { useAuth } from "@/hooks/useAuth"
 import { supabase } from "@/lib/supabase"
 import {
@@ -16,10 +22,10 @@ import {
   Loader2,
   Mail,
   Sparkles,
+  Shield,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-/** Service catalog — optional tags the user can pick */
 const SERVICE_GROUPS: { title: string; tags: string[] }[] = [
   {
     title: "Build",
@@ -47,11 +53,23 @@ const SERVICE_GROUPS: { title: string; tags: string[] }[] = [
   },
   {
     title: "Grow",
-    tags: ["Sales Automation", "Marketing Automation", "Customer Support", "Lead Generation", "SEO"],
+    tags: [
+      "Sales Automation",
+      "Marketing Automation",
+      "Customer Support",
+      "Lead Generation",
+      "SEO",
+    ],
   },
   {
     title: "Data & Digital",
-    tags: ["Data Analytics", "BI Dashboards", "Data Migration", "Digital Transformation", "Process Mining"],
+    tags: [
+      "Data Analytics",
+      "BI Dashboards",
+      "Data Migration",
+      "Digital Transformation",
+      "Process Mining",
+    ],
   },
   {
     title: "Security",
@@ -59,22 +77,30 @@ const SERVICE_GROUPS: { title: string; tags: string[] }[] = [
   },
 ]
 
-type Step = "form" | "submitting" | "claim"
+type Step = "form" | "submitting" | "secure"
 
 export default function Request() {
-  const { signInAnonymously, linkIdentity, linkEmail, isAnonymous, user } = useAuth()
+  const navigate = useNavigate()
+  const {
+    signInAnonymously,
+    linkIdentity,
+    activateWithEmail,
+    isAnonymous,
+    user,
+  } = useAuth()
 
   const [step, setStep] = useState<Step>("form")
   const [description, setDescription] = useState("")
+  const [contactEmail, setContactEmail] = useState("")
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [isRecording, setIsRecording] = useState(false)
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
   const [audioUrl, setAudioUrl] = useState<string | null>(null)
   const [error, setError] = useState("")
   const [requestId, setRequestId] = useState<string | null>(null)
+  const [requestRef, setRequestRef] = useState("")
 
-  // Claim account fields
-  const [email, setEmail] = useState("")
+  // Secure workspace (activation)
   const [password, setPassword] = useState("")
   const [claimLoading, setClaimLoading] = useState(false)
   const [claimMessage, setClaimMessage] = useState("")
@@ -133,68 +159,89 @@ export default function Request() {
       return
     }
 
+    const email = contactEmail.trim().toLowerCase()
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError("Please enter a valid contact email so we can reach you.")
+      return
+    }
+
     setStep("submitting")
 
     try {
-      // 1) Anonymous session (or reuse existing)
+      // 1) Anonymous session (unique per browser)
       const { data: authData, error: authError } = await signInAnonymously()
       if (authError) throw authError
 
-      const userId = authData?.session?.user?.id || authData?.user?.id
-      if (!userId) throw new Error("Could not create a session. Check Anonymous Sign-Ins in Supabase.")
+      const userId =
+        authData?.session?.user?.id ||
+        (authData as any)?.user?.id ||
+        user?.id
 
-      // 2) Optional voice upload
+      if (!userId) {
+        throw new Error(
+          "Could not create a session. Enable Anonymous Sign-Ins in Supabase Auth → Providers."
+        )
+      }
+
+      // 2) Upsert profile contact_email (pending activation)
+      await supabase.from("profiles").upsert(
+        {
+          id: userId,
+          contact_email: email,
+          email: email,
+          activation_status: "pending",
+          role: "buyer_member",
+        },
+        { onConflict: "id" }
+      )
+
+      // 3) Optional voice upload
       let voicePath: string | null = null
       if (audioBlob) {
         const fileName = `${userId}/${Date.now()}.webm`
         const { error: uploadError } = await supabase.storage
           .from("voice-recordings")
-          .upload(fileName, audioBlob, { contentType: "audio/webm", upsert: false })
-
-        if (!uploadError) {
-          voicePath = fileName
-        } else {
-          console.warn("Voice upload failed (bucket may not exist yet):", uploadError.message)
-        }
+          .upload(fileName, audioBlob, {
+            contentType: "audio/webm",
+            upsert: false,
+          })
+        if (!uploadError) voicePath = fileName
+        else console.warn("Voice upload:", uploadError.message)
       }
 
-      // 3) Insert request — works with project_requests table from our schema
-      const payload = {
-        created_by: userId,
-        // buyer_organization_id may be null until they claim account / create org
-        description_text: description.trim() || null,
-        voice_recording_url: voicePath,
-        main_pain_points: selectedTags.length ? selectedTags : null,
-        status: "submitted",
-        submitted_at: new Date().toISOString(),
-        scoring_data: {
-          source: "get_started",
-          tags: selectedTags,
-          anonymous: true,
-        },
-      }
-
-      // Try insert; if buyer_organization_id is NOT NULL in DB, insert without it may fail —
-      // fallback: store in a lightweight leads table pattern via same table with soft fields
-      let insertedId: string | null = null
-
+      // 4) Insert project request
       const { data: row, error: insertError } = await supabase
         .from("project_requests")
-        .insert(payload as any)
+        .insert({
+          created_by: userId,
+          buyer_organization_id: null,
+          description_text: description.trim() || null,
+          voice_recording_url: voicePath,
+          main_pain_points: selectedTags.length ? selectedTags : null,
+          contact_email: email,
+          status: "submitted",
+          submitted_at: new Date().toISOString(),
+          scoring_data: {
+            source: "get_started",
+            tags: selectedTags,
+            anonymous: true,
+          },
+        })
         .select("id")
         .single()
 
       if (insertError) {
-        // Fallback: still succeed UX-wise; log for admin (e.g. org required)
-        console.warn("project_requests insert:", insertError.message)
-        // Store minimal record in scoring-only path or local acknowledgement
-        insertedId = `local-${Date.now()}`
-      } else {
-        insertedId = row?.id ?? null
+        console.error(insertError)
+        throw new Error(
+          insertError.message ||
+            "Could not save your request. Check RLS and schema migration 002."
+        )
       }
 
-      setRequestId(insertedId)
-      setStep("claim")
+      const id = row?.id as string
+      setRequestId(id)
+      setRequestRef(id ? id.replace(/-/g, "").slice(0, 8).toUpperCase() : "——")
+      setStep("secure")
     } catch (err: any) {
       console.error(err)
       setError(err?.message || "Something went wrong. Please try again.")
@@ -207,14 +254,11 @@ export default function Request() {
     setClaimMessage("")
     const { error } = await linkIdentity("google")
     if (error) {
-      // If link fails (e.g. already has identity), try OAuth sign-in
-      const { error: oauthErr } = await (async () => {
-        const { supabase } = await import("@/lib/supabase")
-        return supabase.auth.signInWithOAuth({
-          provider: "google",
-          options: { redirectTo: `${window.location.origin}/buyer` },
-        })
-      })()
+      // Fallback if already has identity / link not available
+      const { error: oauthErr } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: `${window.location.origin}/buyer` },
+      })
       if (oauthErr) setClaimMessage(oauthErr.message)
     }
     setClaimLoading(false)
@@ -225,7 +269,6 @@ export default function Request() {
     setClaimMessage("")
     const { error } = await linkIdentity("linkedin_oidc")
     if (error) {
-      const { supabase } = await import("@/lib/supabase")
       const { error: oauthErr } = await supabase.auth.signInWithOAuth({
         provider: "linkedin_oidc",
         options: { redirectTo: `${window.location.origin}/buyer` },
@@ -235,7 +278,7 @@ export default function Request() {
     setClaimLoading(false)
   }
 
-  const handleEmailClaim = async (e: React.FormEvent) => {
+  const handleEmailActivate = async (e: React.FormEvent) => {
     e.preventDefault()
     setClaimLoading(true)
     setClaimMessage("")
@@ -244,12 +287,14 @@ export default function Request() {
       setClaimLoading(false)
       return
     }
-    const { error } = await linkEmail(email.trim(), password)
+    const { error } = await activateWithEmail(contactEmail.trim(), password)
     if (error) {
       setClaimMessage(error.message)
-    } else {
-      setClaimMessage("Check your email to confirm, then you can sign in anytime.")
+      setClaimLoading(false)
+      return
     }
+    setClaimMessage("Workspace secured. Redirecting…")
+    setTimeout(() => navigate("/buyer"), 800)
     setClaimLoading(false)
   }
 
@@ -258,20 +303,20 @@ export default function Request() {
       <Navbar />
 
       <main className="flex-1 container mx-auto px-4 py-10 max-w-3xl">
-        {/* ——— FORM STEP ——— */}
+        {/* ——— FORM ——— */}
         {step === "form" && (
           <>
             <div className="mb-8 text-center">
               <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs text-primary mb-4">
                 <Sparkles className="h-3.5 w-3.5" />
-                No account needed to start
+                Submit first — secure your workspace after
               </div>
               <h1 className="font-heading text-3xl md:text-4xl font-bold tracking-tight">
                 What do you need built?
               </h1>
               <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
-                Describe your project in your own words — or record a voice note.
-                Optionally tag the areas that matter. We’ll create a clear scope for you.
+                Describe your project. We’ll create a clear scope and contact you
+                on the email you provide.
               </p>
             </div>
 
@@ -282,7 +327,6 @@ export default function Request() {
                 </div>
               )}
 
-              {/* Description */}
               <Card className="border-primary/10 shadow-sm">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg">Tell us what you need</CardTitle>
@@ -292,7 +336,7 @@ export default function Request() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <Textarea
-                    placeholder="Example: We need a CRM connected to WhatsApp and our accounting system, with automated follow-ups for sales..."
+                    placeholder="Example: We need a CRM connected to WhatsApp and accounting, with automated sales follow-ups..."
                     className="min-h-[140px] text-base"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
@@ -300,20 +344,39 @@ export default function Request() {
 
                   <div className="flex flex-wrap items-center gap-3">
                     {!isRecording ? (
-                      <Button type="button" variant="outline" size="sm" onClick={startRecording}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={startRecording}
+                      >
                         <Mic className="mr-2 h-4 w-4" />
                         Record voice note
                       </Button>
                     ) : (
-                      <Button type="button" variant="destructive" size="sm" onClick={stopRecording}>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        onClick={stopRecording}
+                      >
                         <Square className="mr-2 h-4 w-4" />
                         Stop recording
                       </Button>
                     )}
                     {audioUrl && (
                       <div className="flex items-center gap-2">
-                        <audio controls src={audioUrl} className="h-9 max-w-[220px]" />
-                        <Button type="button" variant="ghost" size="sm" onClick={clearAudio}>
+                        <audio
+                          controls
+                          src={audioUrl}
+                          className="h-9 max-w-[220px]"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={clearAudio}
+                        >
                           Remove
                         </Button>
                       </div>
@@ -322,12 +385,39 @@ export default function Request() {
                 </CardContent>
               </Card>
 
-              {/* Neon service tags */}
+              {/* Contact email — required */}
+              <Card className="border-primary/10">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">How can we reach you?</CardTitle>
+                  <CardDescription>
+                    Required — used to follow up on your request. You can secure
+                    login with this email or with Google / LinkedIn next.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <Label htmlFor="contact-email">Contact email</Label>
+                    <Input
+                      id="contact-email"
+                      type="email"
+                      required
+                      placeholder="you@company.com"
+                      value={contactEmail}
+                      onChange={(e) => setContactEmail(e.target.value)}
+                      autoComplete="email"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Neon tags */}
               <div className="space-y-4">
                 <div>
                   <h2 className="font-heading text-lg font-semibold">
                     Tag services{" "}
-                    <span className="text-muted-foreground font-normal text-sm">(optional)</span>
+                    <span className="text-muted-foreground font-normal text-sm">
+                      (optional)
+                    </span>
                   </h2>
                   <p className="text-sm text-muted-foreground mt-1">
                     Tap anything that fits — helps us route your request faster.
@@ -361,15 +451,13 @@ export default function Request() {
                     </div>
                   ))}
                 </div>
-
-                {selectedTags.length > 0 && (
-                  <p className="text-xs text-muted-foreground">
-                    Selected: {selectedTags.join(" · ")}
-                  </p>
-                )}
               </div>
 
-              <Button type="submit" size="lg" className="w-full glow text-base h-12">
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full glow text-base h-12"
+              >
                 <Send className="mr-2 h-4 w-4" />
                 Submit free request
               </Button>
@@ -383,7 +471,7 @@ export default function Request() {
                 <Link to="/privacy" className="underline hover:text-foreground">
                   Privacy Policy
                 </Link>
-                . No password required to start.
+                .
               </p>
             </form>
           </>
@@ -393,37 +481,56 @@ export default function Request() {
         {step === "submitting" && (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
             <Loader2 className="h-10 w-10 animate-spin text-primary" />
-            <p className="font-heading text-lg font-semibold">Sending your request…</p>
-            <p className="text-sm text-muted-foreground">Creating a secure session for you</p>
+            <p className="font-heading text-lg font-semibold">
+              Creating your workspace…
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Saving your request securely
+            </p>
           </div>
         )}
 
-        {/* ——— CLAIM ACCOUNT ——— */}
-        {step === "claim" && (
+        {/* ——— SECURE WORKSPACE ——— */}
+        {step === "secure" && (
           <div className="max-w-md mx-auto space-y-8 py-6">
             <div className="text-center space-y-3">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-success/15 text-success">
                 <CheckCircle2 className="h-7 w-7" />
               </div>
               <h1 className="font-heading text-2xl md:text-3xl font-bold">
-                Request received
+                Your request has been received
               </h1>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                Our team will review it and prepare a clear technical scope.
-                {requestId && !requestId.startsWith("local-") && (
-                  <span className="block mt-1 text-xs opacity-70">Ref: {requestId.slice(0, 8)}…</span>
-                )}
+                We’ve created your workspace.
               </p>
+              <div className="inline-flex flex-col items-center gap-1 rounded-xl border bg-card px-5 py-3 text-sm">
+                <span className="text-muted-foreground text-xs uppercase tracking-wide">
+                  Request
+                </span>
+                <span className="font-heading font-semibold text-lg">
+                  #{requestRef}
+                </span>
+                <span className="text-xs text-success font-medium">
+                  Status: Received
+                </span>
+              </div>
             </div>
 
             <Card className="border-primary/20 shadow-glow">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg">Activate your account</CardTitle>
+                <div className="flex items-center gap-2 text-primary mb-1">
+                  <Shield className="h-4 w-4" />
+                  <span className="text-xs font-semibold uppercase tracking-wide">
+                    Secure your workspace
+                  </span>
+                </div>
+                <CardTitle className="text-lg">
+                  Access from any device
+                </CardTitle>
                 <CardDescription>
-                  Link Google, LinkedIn, or email so you can track progress and receive updates.
-                  {isAnonymous || user?.is_anonymous
-                    ? " Your request stays connected to this session."
-                    : ""}
+                  Activate with Google, LinkedIn, or the same email you just
+                  provided
+                  {isAnonymous ? " — your request stays linked to this session." : "."}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -468,7 +575,12 @@ export default function Request() {
                   disabled={claimLoading}
                   onClick={handleLinkedIn}
                 >
-                  <svg className="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <svg
+                    className="mr-2 h-4 w-4"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden
+                  >
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                   </svg>
                   Continue with LinkedIn
@@ -479,44 +591,54 @@ export default function Request() {
                     <span className="w-full border-t" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">or email</span>
+                    <span className="bg-card px-2 text-muted-foreground">
+                      or use your contact email
+                    </span>
                   </div>
                 </div>
 
-                <form onSubmit={handleEmailClaim} className="space-y-3">
+                <form onSubmit={handleEmailActivate} className="space-y-3">
                   <div className="space-y-2">
-                    <Label htmlFor="claim-email">Email</Label>
+                    <Label htmlFor="activate-email">Email</Label>
                     <Input
-                      id="claim-email"
+                      id="activate-email"
                       type="email"
-                      placeholder="you@company.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
+                      value={contactEmail}
+                      readOnly
+                      className="bg-muted/50"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="claim-password">Password</Label>
+                    <Label htmlFor="activate-password">Choose a password</Label>
                     <Input
-                      id="claim-password"
+                      id="activate-password"
                       type="password"
                       placeholder="Min. 6 characters"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
+                      autoComplete="new-password"
                     />
                   </div>
-                  <Button type="submit" className="w-full" disabled={claimLoading}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={claimLoading}
+                  >
                     {claimLoading ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
                       <Mail className="mr-2 h-4 w-4" />
                     )}
-                    Activate with email
+                    Secure with email & password
                   </Button>
                 </form>
 
-                <Button asChild variant="ghost" className="w-full text-muted-foreground">
+                <Button
+                  asChild
+                  variant="ghost"
+                  className="w-full text-muted-foreground"
+                >
                   <Link to="/buyer">Skip for now — go to dashboard</Link>
                 </Button>
               </CardContent>

@@ -12,9 +12,7 @@ export function useAuth() {
 
     const init = async () => {
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession()
+        const { data: { session } } = await supabase.auth.getSession()
         if (!mounted) return
         setSession(session)
         setUser(session?.user ?? null)
@@ -27,14 +25,14 @@ export function useAuth() {
 
     init()
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!mounted) return
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (!mounted) return
+        setSession(session)
+        setUser(session?.user ?? null)
+        setLoading(false)
+      }
+    )
 
     return () => {
       mounted = false
@@ -42,12 +40,12 @@ export function useAuth() {
     }
   }, [])
 
+  /** Start or reuse anonymous session (browser-scoped). */
   const signInAnonymously = async () => {
     try {
-      // If already signed in (anonymous or not), reuse session
       const { data: existing } = await supabase.auth.getSession()
       if (existing.session?.user) {
-        return { data: existing, error: null }
+        return { data: existing, error: null as null }
       }
       const { data, error } = await supabase.auth.signInAnonymously()
       return { data, error }
@@ -58,10 +56,7 @@ export function useAuth() {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password })
       return { data, error }
     } catch (err: any) {
       return { data: null, error: err }
@@ -81,7 +76,7 @@ export function useAuth() {
     }
   }
 
-  /** Link Google / LinkedIn to the current (often anonymous) user */
+  /** Link Google or LinkedIn to current (often anonymous) user. Keeps same user id. */
   const linkIdentity = async (provider: "google" | "linkedin_oidc") => {
     try {
       const { data, error } = await supabase.auth.linkIdentity({
@@ -96,7 +91,6 @@ export function useAuth() {
     }
   }
 
-  /** OAuth sign-in (also works if user is not anonymous yet) */
   const signInWithOAuth = async (provider: "google" | "linkedin_oidc") => {
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -111,13 +105,27 @@ export function useAuth() {
     }
   }
 
-  /** Upgrade anonymous user by attaching email + password */
-  const linkEmail = async (email: string, password: string) => {
+  /**
+   * Upgrade anonymous user with email + password.
+   * Prefer same contact_email so user does not re-type it.
+   */
+  const activateWithEmail = async (email: string, password: string) => {
     try {
       const { data, error } = await supabase.auth.updateUser({
-        email,
+        email: email.trim(),
         password,
+        data: { contact_email: email.trim() },
       })
+      if (!error) {
+        await supabase
+          .from("profiles")
+          .update({
+            contact_email: email.trim(),
+            activation_status: "activated",
+            email: email.trim(),
+          })
+          .eq("id", data.user?.id)
+      }
       return { data, error }
     } catch (err: any) {
       return { data: null, error: err }
@@ -145,7 +153,7 @@ export function useAuth() {
     signUp,
     linkIdentity,
     signInWithOAuth,
-    linkEmail,
+    activateWithEmail,
     signOut,
   }
 }
