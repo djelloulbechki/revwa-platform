@@ -5,92 +5,93 @@
 @layer base {
   :root {
     /*
-      Jolt structure + B2B tech palette
-      Trust, clarity, professionalism — still bold, not playful-consumer
+      REVWA — Luxury luminous violet
+      Vendr vivid + Odoo eggplant depth + original REVWA glow
     */
-    --ink: 222 25% 12%;          /* cool near-black */
-    --paper: 210 25% 98%;        /* clean cool off-white */
-    --pop: 226 70% 48%;          /* strong indigo-blue CTA */
-    --sky: 215 65% 42%;          /* deep professional blue */
-    --sun: 175 45% 42%;          /* teal — fair / clarity */
-    --mint: 158 50% 38%;         /* solid green — success / trust */
-    --vio: 250 35% 38%;          /* muted indigo-violet */
+    --ink: 270 28% 10%;
+    --paper: 270 25% 98%;
+    --pop: 258 88% 58%;           /* vivid violet-indigo (Vendr-like) */
+    --sky: 250 55% 42%;           /* deep violet-blue cards */
+    --sun: 183 70% 32%;           /* Odoo-style teal secondary */
+    --mint: 162 48% 38%;          /* success green */
+    --vio: 300 22% 36%;           /* eggplant / luxury muted violet */
 
-    --background: 210 25% 98%;
-    --foreground: 222 25% 12%;
+    --background: 270 25% 98%;
+    --foreground: 270 28% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 25% 12%;
+    --card-foreground: 270 28% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 25% 12%;
+    --popover-foreground: 270 28% 10%;
 
-    --primary: 226 70% 48%;
+    --primary: 258 88% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 20% 94%;
-    --secondary-foreground: 222 25% 12%;
+    --secondary: 270 18% 94%;
+    --secondary-foreground: 270 28% 12%;
 
-    --muted: 210 18% 94%;
-    --muted-foreground: 220 12% 42%;
+    --muted: 270 16% 94%;
+    --muted-foreground: 270 12% 42%;
 
-    --accent: 226 70% 48%;
+    --accent: 258 88% 58%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 88%;
-    --input: 220 15% 85%;
-    --ring: 226 70% 48%;
+    --border: 270 14% 88%;
+    --input: 270 14% 85%;
+    --ring: 258 88% 58%;
 
     --radius: 0.75rem;
 
-    --primary-glow: 226 75% 55%;
-    --primary-deep: 226 70% 32%;
-    --success: 158 50% 38%;
+    --primary-glow: 265 95% 68%;
+    --primary-deep: 258 72% 28%;
+    --success: 162 48% 38%;
   }
 
   .dark {
-    --ink: 210 25% 96%;
-    --paper: 222 28% 8%;
-    --pop: 226 75% 58%;
-    --sky: 215 60% 52%;
-    --sun: 175 40% 48%;
-    --mint: 158 45% 48%;
-    --vio: 250 35% 55%;
+    /* الغمقان المشع — deep luminous violet black */
+    --ink: 270 30% 96%;
+    --paper: 268 42% 5%;
+    --pop: 258 90% 64%;
+    --sky: 250 55% 52%;
+    --sun: 183 55% 42%;
+    --mint: 162 45% 48%;
+    --vio: 300 28% 52%;
 
-    --background: 222 28% 8%;
-    --foreground: 210 25% 96%;
+    --background: 268 42% 5%;
+    --foreground: 270 30% 96%;
 
-    --card: 222 24% 12%;
-    --card-foreground: 210 25% 96%;
+    --card: 268 36% 9%;
+    --card-foreground: 270 30% 96%;
 
-    --popover: 222 24% 12%;
-    --popover-foreground: 210 25% 96%;
+    --popover: 268 36% 9%;
+    --popover-foreground: 270 30% 96%;
 
-    --primary: 226 75% 58%;
+    --primary: 258 90% 64%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 18% 16%;
-    --secondary-foreground: 210 25% 96%;
+    --secondary: 268 28% 14%;
+    --secondary-foreground: 270 30% 96%;
 
-    --muted: 220 18% 16%;
-    --muted-foreground: 215 12% 60%;
+    --muted: 268 28% 14%;
+    --muted-foreground: 270 14% 62%;
 
-    --accent: 226 75% 58%;
+    --accent: 258 90% 64%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 65% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 20%;
-    --input: 220 15% 22%;
-    --ring: 226 75% 58%;
+    --border: 268 25% 16%;
+    --input: 268 25% 18%;
+    --ring: 258 90% 64%;
 
-    --primary-glow: 226 80% 62%;
-    --primary-deep: 226 65% 35%;
-    --success: 158 45% 48%;
+    --primary-glow: 265 100% 72%;
+    --primary-deep: 258 70% 32%;
+    --success: 162 45% 48%;
   }
 }
 
@@ -116,24 +117,32 @@
 
 @layer utilities {
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-pop to-sky;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-pop via-[hsl(var(--primary-glow))] to-sky;
   }
 
   .glow {
-    box-shadow: 0 6px 0 0 hsl(var(--ink) / 0.2);
+    box-shadow:
+      0 0 20px -4px hsl(var(--primary-glow) / 0.45),
+      0 6px 0 0 hsl(var(--primary-deep) / 0.35);
   }
 
   .glow-lg {
-    box-shadow: 0 8px 0 0 hsl(var(--ink) / 0.25);
+    box-shadow:
+      0 0 32px -4px hsl(var(--primary-glow) / 0.55),
+      0 8px 0 0 hsl(var(--primary-deep) / 0.4);
   }
 
   .btn-pop {
     @apply rounded-full bg-pop font-bold text-white transition-all;
-    box-shadow: 0 6px 0 0 hsl(var(--ink) / 0.25);
+    box-shadow:
+      0 0 18px -2px hsl(var(--primary-glow) / 0.5),
+      0 6px 0 0 hsl(var(--primary-deep) / 0.4);
   }
   .btn-pop:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 0 0 hsl(var(--ink) / 0.3);
+    box-shadow:
+      0 0 28px -2px hsl(var(--primary-glow) / 0.65),
+      0 8px 0 0 hsl(var(--primary-deep) / 0.45);
   }
 
   .btn-ink {
@@ -153,13 +162,20 @@
   .neon-tag-idle:hover {
     border-color: hsl(var(--pop) / 0.45);
     color: hsl(var(--foreground));
+    box-shadow: 0 0 12px -4px hsl(var(--primary-glow) / 0.35);
   }
   .neon-tag-active {
     border: 2px solid hsl(var(--pop) / 0.7);
-    background: hsl(var(--pop) / 0.1);
+    background: hsl(var(--pop) / 0.12);
     color: hsl(var(--pop));
+    box-shadow:
+      0 0 14px -2px hsl(var(--primary-glow) / 0.5),
+      0 0 4px hsl(var(--primary-glow) / 0.25) inset;
   }
   .dark .neon-tag-active {
-    background: hsl(var(--pop) / 0.18);
+    background: hsl(var(--pop) / 0.2);
+    box-shadow:
+      0 0 20px -2px hsl(var(--primary-glow) / 0.6),
+      0 0 6px hsl(var(--primary-glow) / 0.3) inset;
   }
 }

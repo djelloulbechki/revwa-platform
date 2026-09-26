@@ -9,13 +9,13 @@ export function Hero() {
         <div className="flex flex-col items-start gap-12 lg:flex-row lg:items-center lg:gap-16">
           <div className="w-full lg:w-1/2">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border-2 border-ink/10 bg-card px-4 py-1.5 text-sm font-medium text-ink/70">
-              <span className="size-2 rounded-full bg-mint" />
+              <span className="size-2 rounded-full bg-pop shadow-[0_0_8px_hsl(var(--primary-glow)/0.8)]" />
               Independent B2B Tech Procurement
             </div>
 
             <h1 className="font-display text-[clamp(2.4rem,6vw,4.5rem)] uppercase leading-[0.95] tracking-tight text-ink">
               Fair tech deals.{" "}
-              <span className="text-pop">Clear scope.</span>{" "}
+              <span className="text-gradient">Clear scope.</span>{" "}
               No surprises.
             </h1>
 
@@ -42,7 +42,7 @@ export function Hero() {
 
             <div className="mt-8 flex items-center gap-3">
               <div className="flex -space-x-2">
-                <span className="size-8 rounded-full border-2 border-paper bg-sky" />
+                <span className="size-8 rounded-full border-2 border-paper bg-pop shadow-[0_0_10px_hsl(var(--primary-glow)/0.5)]" />
                 <span className="size-8 rounded-full border-2 border-paper bg-sun" />
                 <span className="size-8 rounded-full border-2 border-paper bg-mint" />
               </div>

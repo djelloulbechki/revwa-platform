@@ -9,7 +9,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "rounded-full bg-pop text-white shadow-[0_6px_0_0_hsl(var(--ink)/0.25)] hover:-translate-y-1 hover:shadow-[0_8px_0_0_hsl(var(--ink)/0.3)]",
+          "rounded-full bg-pop text-white shadow-[0_0_18px_-2px_hsl(var(--primary-glow)/0.5),0_6px_0_0_hsl(var(--primary-deep)/0.4)] hover:-translate-y-1 hover:shadow-[0_0_28px_-2px_hsl(var(--primary-glow)/0.65),0_8px_0_0_hsl(var(--primary-deep)/0.45)]",
         destructive:
           "rounded-full bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
         outline:
@@ -18,8 +18,8 @@ const buttonVariants = cva(
           "rounded-full bg-secondary text-secondary-foreground border-2 border-ink/10 hover:bg-muted",
         ghost: "rounded-full hover:bg-muted hover:text-foreground",
         link: "text-pop underline-offset-4 hover:underline decoration-2",
-        sky: "rounded-full bg-sky text-white shadow-[0_6px_0_0_hsl(var(--ink)/0.25)] hover:-translate-y-1 hover:shadow-[0_8px_0_0_hsl(var(--ink)/0.3)]",
-        mint: "rounded-full bg-mint text-white shadow-[0_6px_0_0_hsl(var(--ink)/0.25)] hover:-translate-y-1 hover:shadow-[0_8px_0_0_hsl(var(--ink)/0.3)]",
+        sky: "rounded-full bg-sky text-white shadow-[0_0_14px_-2px_hsl(var(--sky)/0.4),0_6px_0_0_hsl(var(--ink)/0.25)] hover:-translate-y-1",
+        mint: "rounded-full bg-mint text-white shadow-[0_0_14px_-2px_hsl(var(--mint)/0.35),0_6px_0_0_hsl(var(--ink)/0.25)] hover:-translate-y-1",
       },
       size: {
         default: "h-10 px-5 py-2",
