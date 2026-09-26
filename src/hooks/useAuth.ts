@@ -116,7 +116,7 @@ export function useAuth() {
         password,
         data: { contact_email: email.trim() },
       })
-      if (!error) {
+      if (!error && data.user?.id) {
         await supabase
           .from("profiles")
           .update({
@@ -124,7 +124,17 @@ export function useAuth() {
             activation_status: "activated",
             email: email.trim(),
           })
-          .eq("id", data.user?.id)
+          .eq("id", data.user.id)
+
+        // Keep buyer_profiles in sync (display_name from email local-part if empty)
+        await supabase.from("buyer_profiles").upsert(
+          {
+            user_id: data.user.id,
+            kind: "individual",
+            display_name: email.trim().split("@")[0] || "Buyer",
+          },
+          { onConflict: "user_id" }
+        )
       }
       return { data, error }
     } catch (err: any) {

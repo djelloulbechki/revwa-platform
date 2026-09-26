@@ -184,7 +184,7 @@ export default function Request() {
       }
 
       // 2) Upsert profile contact_email (pending activation)
-      await supabase.from("profiles").upsert(
+      const { error: profileErr } = await supabase.from("profiles").upsert(
         {
           id: userId,
           contact_email: email,
@@ -194,6 +194,19 @@ export default function Request() {
         },
         { onConflict: "id" }
       )
+      if (profileErr) console.warn("profiles upsert:", profileErr.message)
+
+      // 2b) Ensure buyer_profiles (mandatory for individual + company)
+      const displayName = email.split("@")[0] || "Buyer"
+      const { error: buyerErr } = await supabase.from("buyer_profiles").upsert(
+        {
+          user_id: userId,
+          kind: "individual",
+          display_name: displayName,
+        },
+        { onConflict: "user_id" }
+      )
+      if (buyerErr) console.warn("buyer_profiles upsert:", buyerErr.message)
 
       // 3) Optional voice upload
       let voicePath: string | null = null
@@ -219,6 +232,8 @@ export default function Request() {
           voice_recording_url: voicePath,
           main_pain_points: selectedTags.length ? selectedTags : null,
           contact_email: email,
+          buyer_kind: "individual",
+          has_formal_spec: false,
           status: "submitted",
           submitted_at: new Date().toISOString(),
           scoring_data: {
