@@ -1,136 +1,185 @@
-import { useParams, Link } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { Link, useParams } from "react-router-dom"
 import { Navbar } from "@/components/layout/Navbar"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, FileText, Users, CheckCircle } from "lucide-react"
+import { ArrowLeft, Loader2 } from "lucide-react"
+import { supabase } from "@/lib/supabase"
+import { useAuth } from "@/hooks/useAuth"
 
-const mockProposals = [
-  { id: "p1", vendor: "Vendor A", price: "$18,500", duration: "45 days", rank: 1, recommended: true },
-  { id: "p2", vendor: "Vendor B", price: "$21,200", duration: "38 days", rank: 2, recommended: false },
-  { id: "p3", vendor: "Vendor C", price: "$16,900", duration: "60 days", rank: 3, recommended: false },
-]
+type ProjectRequest = {
+  id: string
+  title: string | null
+  description_text: string | null
+  status: string
+  contact_email: string | null
+  main_pain_points: string[] | null
+  voice_recording_url: string | null
+  budget_min: number | null
+  budget_max: number | null
+  currency: string | null
+  timeline: string | null
+  submitted_at: string | null
+  created_at: string
+  scoring_data: Record<string, unknown> | null
+}
+
+const statusLabel: Record<string, string> = {
+  draft: "Draft",
+  submitted: "Submitted",
+  under_review: "Under Review",
+  scoping: "Scoping",
+  rfq_sent: "RFQ Sent",
+  proposals_received: "Proposals Received",
+  shortlisted: "Shortlisted",
+  negotiation: "Negotiation",
+  won: "Won",
+  lost: "Lost",
+  cancelled: "Cancelled",
+  archived: "Archived",
+}
 
 export default function RequestDetails() {
-  const { id } = useParams()
+  const { id } = useParams<{ id: string }>()
+  const { user, loading: authLoading } = useAuth()
+  const [req, setReq] = useState<ProjectRequest | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+
+  useEffect(() => {
+    if (authLoading || !id) return
+    if (!user) {
+      setLoading(false)
+      return
+    }
+
+    let cancelled = false
+
+    const load = async () => {
+      setLoading(true)
+      const { data, error: qErr } = await supabase
+        .from("project_requests")
+        .select(
+          "id, title, description_text, status, contact_email, main_pain_points, voice_recording_url, budget_min, budget_max, currency, timeline, submitted_at, created_at, scoring_data"
+        )
+        .eq("id", id)
+        .eq("created_by", user.id)
+        .maybeSingle()
+
+      if (cancelled) return
+
+      if (qErr) {
+        setError(qErr.message)
+        setReq(null)
+      } else {
+        setReq(data as ProjectRequest | null)
+        if (!data) setError("Request not found or you don’t have access.")
+      }
+      setLoading(false)
+    }
+
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [id, user, authLoading])
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
-      <main className="flex-1 container mx-auto px-4 py-10 max-w-5xl">
+      <main className="flex-1 container mx-auto px-4 py-10 max-w-3xl">
         <Button asChild variant="ghost" size="sm" className="mb-6">
           <Link to="/buyer">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
+            Back to requests
           </Link>
         </Button>
 
-        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-8">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Badge>Shortlisted</Badge>
-              <span className="text-sm text-muted-foreground">ID: {id}</span>
-            </div>
-            <h1 className="font-heading text-3xl font-bold">Custom CRM for Sales Team</h1>
-            <p className="text-muted-foreground mt-1">Created on Sep 20, 2026 · Budget $15k–25k</p>
+        {loading || authLoading ? (
+          <div className="flex justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-primary" />
-                Scope Document
-              </CardTitle>
-              <CardDescription>Technical requirements prepared by REVWA</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 text-sm">
-              <div>
-                <h4 className="font-semibold mb-1">Objectives</h4>
-                <ul className="list-disc list-inside text-muted-foreground space-y-1">
-                  <li>Replace current spreadsheet-based sales tracking</li>
-                  <li>Integrate with existing email and calendar</li>
-                  <li>Provide real-time pipeline visibility for managers</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-1">Key Requirements</h4>
-                <ul className="list-disc list-inside text-muted-foreground space-y-1">
-                  <li>Contact & deal management</li>
-                  <li>Custom pipelines and stages</li>
-                  <li>Role-based access (sales, managers, admin)</li>
-                  <li>Mobile-responsive web app</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-1">Out of Scope</h4>
-                <p className="text-muted-foreground">Marketing automation, full ERP modules, native mobile apps.</p>
-              </div>
-            </CardContent>
-          </Card>
-
+        ) : error || !req ? (
           <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Status Timeline</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ol className="relative border-l border-muted space-y-6 ml-2">
-                {[
-                  { label: "Submitted", done: true },
-                  { label: "Scope created", done: true },
-                  { label: "RFQ sent", done: true },
-                  { label: "Proposals received", done: true },
-                  { label: "Shortlisted", done: true },
-                  { label: "Final selection", done: false },
-                ].map((step, i) => (
-                  <li key={i} className="ml-4">
-                    <span className={`absolute -left-1.5 mt-1.5 h-3 w-3 rounded-full ${step.done ? "bg-primary" : "bg-muted"}`} />
-                    <p className={`text-sm ${step.done ? "font-medium" : "text-muted-foreground"}`}>{step.label}</p>
-                  </li>
-                ))}
-              </ol>
+            <CardContent className="py-10 text-center text-muted-foreground">
+              {error || "Request not found."}
             </CardContent>
           </Card>
-        </div>
+        ) : (
+          <div className="space-y-6">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h1 className="font-heading text-2xl md:text-3xl font-bold">
+                  {req.title?.trim() ||
+                    req.description_text?.trim()?.slice(0, 80) ||
+                    "Request"}
+                </h1>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {req.submitted_at || req.created_at
+                    ? new Date(req.submitted_at || req.created_at).toLocaleString()
+                    : ""}
+                  {req.contact_email ? ` · ${req.contact_email}` : ""}
+                </p>
+              </div>
+              <Badge>{statusLabel[req.status] || req.status}</Badge>
+            </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-primary" />
-              Shortlisted Proposals
-            </CardTitle>
-            <CardDescription>Top 3 proposals selected by REVWA for your review</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {mockProposals.map((p) => (
-              <div
-                key={p.id}
-                className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-xl border ${
-                  p.recommended ? "border-primary/40 bg-primary/5" : "bg-card"
-                }`}
-              >
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Description</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="whitespace-pre-wrap text-sm leading-relaxed">
+                  {req.description_text || "—"}
+                </p>
+              </CardContent>
+            </Card>
+
+            {req.main_pain_points && req.main_pain_points.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Tagged services</CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-wrap gap-2">
+                  {req.main_pain_points.map((t) => (
+                    <Badge key={t} variant="secondary">
+                      {t}
+                    </Badge>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Details</CardTitle>
+              </CardHeader>
+              <CardContent className="grid sm:grid-cols-2 gap-3 text-sm">
                 <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-semibold">#{p.rank} — {p.vendor}</span>
-                    {p.recommended && (
-                      <Badge variant="success" className="gap-1">
-                        <CheckCircle className="h-3 w-3" /> Recommended
-                      </Badge>
-                    )}
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {p.price} · Estimated {p.duration}
+                  <p className="text-muted-foreground text-xs">Contact email</p>
+                  <p>{req.contact_email || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">Timeline</p>
+                  <p>{req.timeline || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">Budget</p>
+                  <p>
+                    {req.budget_min != null || req.budget_max != null
+                      ? `${req.currency || "USD"} ${req.budget_min ?? "?"} – ${req.budget_max ?? "?"}`
+                      : "—"}
                   </p>
                 </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">View Details</Button>
-                  <Button size="sm">Select</Button>
+                <div>
+                  <p className="text-muted-foreground text-xs">Voice note</p>
+                  <p>{req.voice_recording_url ? "Uploaded" : "None"}</p>
                 </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </main>
     </div>
   )
