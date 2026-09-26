@@ -1,5 +1,3 @@
-import { MessageSquare, FileText, Send, Trophy } from "lucide-react"
-
 const steps = [
   {
     n: "01",
@@ -12,15 +10,15 @@ const steps = [
     n: "02",
     title: "We create a clear scope",
     desc: "Our team turns your needs into a precise technical requirements document.",
-    className: "bg-sun text-ink",
-    bodyClass: "text-ink/80",
+    className: "bg-sun text-white",
+    bodyClass: "text-white/85",
   },
   {
     n: "03",
     title: "Anonymous RFQ",
     desc: "We send the scoped request to qualified vendors without revealing your identity.",
-    className: "bg-mint text-ink",
-    bodyClass: "text-ink/80",
+    className: "bg-mint text-white",
+    bodyClass: "text-white/85",
   },
   {
     n: "04",

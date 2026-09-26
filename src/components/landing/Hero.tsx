@@ -43,8 +43,8 @@ export function Hero() {
             <div className="mt-8 flex items-center gap-3">
               <div className="flex -space-x-2">
                 <span className="size-8 rounded-full border-2 border-paper bg-sky" />
+                <span className="size-8 rounded-full border-2 border-paper bg-sun" />
                 <span className="size-8 rounded-full border-2 border-paper bg-mint" />
-                <span className="size-8 rounded-full border-2 border-paper bg-vio" />
               </div>
               <p className="text-sm font-medium text-ink/60">
                 First deal free for buyers
@@ -65,19 +65,19 @@ export function Hero() {
                 icon: FileSearch,
                 title: "Clear Scope",
                 desc: "Professional tech requirements documents",
-                bg: "bg-sun text-ink",
-                body: "text-ink/80",
+                bg: "bg-sun text-white",
+                body: "text-white/85",
               },
               {
                 icon: Shield,
                 title: "Zero Commitment",
                 desc: "First deal completely free for buyers",
-                bg: "bg-mint text-ink",
-                body: "text-ink/80",
+                bg: "bg-mint text-white",
+                body: "text-white/85",
               },
             ].map((item) => (
               <div key={item.title} className={`rounded-3xl p-6 ${item.bg}`}>
-                <item.icon className="mb-3 h-8 w-8 opacity-80" />
+                <item.icon className="mb-3 h-8 w-8 opacity-90" />
                 <h3 className="font-display text-lg uppercase">{item.title}</h3>
                 <p className={`mt-1 text-sm leading-relaxed ${item.body}`}>
                   {item.desc}

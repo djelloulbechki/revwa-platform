@@ -64,10 +64,10 @@ export default {
         "4xl": "2.5rem",
       },
       boxShadow: {
-        glow: "0 6px 0 0 hsl(var(--sun))",
-        "glow-lg": "0 8px 0 0 hsl(var(--sun))",
-        pop: "0 6px 0 0 hsl(var(--sun))",
-        "pop-lg": "0 8px 0 0 hsl(var(--sun))",
+        glow: "0 6px 0 0 hsl(var(--ink) / 0.25)",
+        "glow-lg": "0 8px 0 0 hsl(var(--ink) / 0.3)",
+        pop: "0 6px 0 0 hsl(var(--ink) / 0.25)",
+        "pop-lg": "0 8px 0 0 hsl(var(--ink) / 0.3)",
         ink: "0 6px 0 0 hsl(var(--ink))",
       },
       keyframes: {

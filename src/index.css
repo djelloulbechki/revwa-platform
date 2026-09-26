@@ -4,90 +4,93 @@
 
 @layer base {
   :root {
-    /* ===== Jolt-inspired palette (light) ===== */
-    --ink: 40 15% 15%;
-    --paper: 45 40% 97%;
-    --pop: 12 80% 55%;
-    --sky: 250 70% 50%;
-    --sun: 50 90% 65%;
-    --mint: 160 55% 65%;
-    --vio: 280 70% 50%;
+    /*
+      Jolt structure + B2B tech palette
+      Trust, clarity, professionalism — still bold, not playful-consumer
+    */
+    --ink: 222 25% 12%;          /* cool near-black */
+    --paper: 210 25% 98%;        /* clean cool off-white */
+    --pop: 226 70% 48%;          /* strong indigo-blue CTA */
+    --sky: 215 65% 42%;          /* deep professional blue */
+    --sun: 175 45% 42%;          /* teal — fair / clarity */
+    --mint: 158 50% 38%;         /* solid green — success / trust */
+    --vio: 250 35% 38%;          /* muted indigo-violet */
 
-    --background: 45 40% 97%;
-    --foreground: 40 15% 15%;
+    --background: 210 25% 98%;
+    --foreground: 222 25% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 40 15% 15%;
+    --card-foreground: 222 25% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 40 15% 15%;
+    --popover-foreground: 222 25% 12%;
 
-    --primary: 12 80% 55%;
+    --primary: 226 70% 48%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 50 90% 65%;
-    --secondary-foreground: 40 15% 15%;
+    --secondary: 210 20% 94%;
+    --secondary-foreground: 222 25% 12%;
 
-    --muted: 45 25% 93%;
-    --muted-foreground: 40 10% 40%;
+    --muted: 210 18% 94%;
+    --muted-foreground: 220 12% 42%;
 
-    --accent: 12 80% 55%;
+    --accent: 226 70% 48%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 80% 55%;
+    --destructive: 0 72% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 40 12% 88%;
-    --input: 40 12% 85%;
-    --ring: 12 80% 55%;
+    --border: 220 15% 88%;
+    --input: 220 15% 85%;
+    --ring: 226 70% 48%;
 
     --radius: 0.75rem;
 
-    --primary-glow: 12 90% 60%;
-    --primary-deep: 12 80% 40%;
-    --success: 160 55% 40%;
+    --primary-glow: 226 75% 55%;
+    --primary-deep: 226 70% 32%;
+    --success: 158 50% 38%;
   }
 
   .dark {
-    --ink: 45 30% 95%;
-    --paper: 40 20% 10%;
-    --pop: 12 80% 58%;
-    --sky: 250 70% 62%;
-    --sun: 50 85% 60%;
-    --mint: 160 50% 55%;
-    --vio: 280 65% 60%;
+    --ink: 210 25% 96%;
+    --paper: 222 28% 8%;
+    --pop: 226 75% 58%;
+    --sky: 215 60% 52%;
+    --sun: 175 40% 48%;
+    --mint: 158 45% 48%;
+    --vio: 250 35% 55%;
 
-    --background: 40 20% 10%;
-    --foreground: 45 30% 95%;
+    --background: 222 28% 8%;
+    --foreground: 210 25% 96%;
 
-    --card: 40 18% 14%;
-    --card-foreground: 45 30% 95%;
+    --card: 222 24% 12%;
+    --card-foreground: 210 25% 96%;
 
-    --popover: 40 18% 14%;
-    --popover-foreground: 45 30% 95%;
+    --popover: 222 24% 12%;
+    --popover-foreground: 210 25% 96%;
 
-    --primary: 12 80% 58%;
+    --primary: 226 75% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 50 70% 45%;
-    --secondary-foreground: 40 20% 10%;
+    --secondary: 220 18% 16%;
+    --secondary-foreground: 210 25% 96%;
 
-    --muted: 40 15% 18%;
-    --muted-foreground: 40 10% 65%;
+    --muted: 220 18% 16%;
+    --muted-foreground: 215 12% 60%;
 
-    --accent: 12 80% 58%;
+    --accent: 226 75% 58%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 75% 50%;
+    --destructive: 0 65% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 40 15% 22%;
-    --input: 40 15% 25%;
-    --ring: 12 80% 58%;
+    --border: 220 15% 20%;
+    --input: 220 15% 22%;
+    --ring: 226 75% 58%;
 
-    --primary-glow: 12 90% 62%;
-    --primary-deep: 12 75% 35%;
-    --success: 160 50% 45%;
+    --primary-glow: 226 80% 62%;
+    --primary-deep: 226 65% 35%;
+    --success: 158 45% 48%;
   }
 }
 
@@ -117,20 +120,20 @@
   }
 
   .glow {
-    box-shadow: 0 6px 0 0 hsl(var(--sun));
+    box-shadow: 0 6px 0 0 hsl(var(--ink) / 0.2);
   }
 
   .glow-lg {
-    box-shadow: 0 8px 0 0 hsl(var(--sun));
+    box-shadow: 0 8px 0 0 hsl(var(--ink) / 0.25);
   }
 
   .btn-pop {
     @apply rounded-full bg-pop font-bold text-white transition-all;
-    box-shadow: 0 6px 0 0 hsl(var(--sun));
+    box-shadow: 0 6px 0 0 hsl(var(--ink) / 0.25);
   }
   .btn-pop:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 0 0 hsl(var(--sun));
+    box-shadow: 0 8px 0 0 hsl(var(--ink) / 0.3);
   }
 
   .btn-ink {
