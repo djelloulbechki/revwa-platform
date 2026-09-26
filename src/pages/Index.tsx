@@ -2,19 +2,27 @@ import { Navbar } from "@/components/layout/Navbar"
 import { Hero } from "@/components/landing/Hero"
 import { HowItWorks } from "@/components/landing/HowItWorks"
 import { CTA } from "@/components/landing/CTA"
+import { Link } from "react-router-dom"
 
 export default function Index() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col bg-paper font-body text-ink">
       <Navbar />
       <main className="flex-1">
         <Hero />
         <HowItWorks />
         <CTA />
       </main>
-      <footer className="border-t py-8 text-center text-sm text-muted-foreground">
-        <div className="container mx-auto px-4">
-          © {new Date().getFullYear()} REVWA — Independent B2B Tech Procurement Desk
+      <footer className="mx-auto flex w-full max-w-[1440px] flex-col items-center justify-between gap-3 px-6 pb-10 text-sm text-ink/50 sm:flex-row md:px-10">
+        <span className="font-display uppercase text-ink">REVWA</span>
+        <div className="flex flex-wrap items-center justify-center gap-4">
+          <Link to="/terms" className="hover:text-pop">
+            Terms
+          </Link>
+          <Link to="/privacy" className="hover:text-pop">
+            Privacy
+          </Link>
+          <span>© {new Date().getFullYear()} — Fair tech deals</span>
         </div>
       </footer>
     </div>

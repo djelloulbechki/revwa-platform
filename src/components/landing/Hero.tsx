@@ -4,53 +4,87 @@ import { ArrowRight, Shield, FileSearch, Scale } from "lucide-react"
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden pt-16 pb-24 md:pt-24 md:pb-32">
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background" />
-      
-      <div className="container mx-auto px-4 text-center">
-        <div className="inline-flex items-center gap-2 rounded-full border bg-card px-4 py-1.5 text-sm text-muted-foreground mb-8">
-          <Shield className="h-4 w-4 text-primary" />
-          Independent B2B Tech Procurement
-        </div>
-
-        <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight max-w-4xl mx-auto leading-tight">
-          Fair tech deals.{" "}
-          <span className="text-gradient">Clear scope.</span>{" "}
-          No surprises.
-        </h1>
-
-        <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-          REVWA protects companies from overpriced quotes and vague requirements. 
-          We turn your needs into precise technical scopes and match you with the right vendors — anonymously and fairly.
-        </p>
-
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button asChild size="lg" className="glow text-base px-8">
-            <Link to="/request">
-              Start Free Request
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
-          <Button asChild variant="outline" size="lg" className="text-base px-8">
-            <Link to="/quote-audit">
-              <FileSearch className="mr-2 h-5 w-5" />
-              Audit Existing Quote
-            </Link>
-          </Button>
-        </div>
-
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          {[
-            { icon: Scale, title: "Fair Pricing", desc: "Anonymous RFQs force real competition" },
-            { icon: FileSearch, title: "Clear Scope", desc: "Professional tech requirements documents" },
-            { icon: Shield, title: "Zero Commitment", desc: "First deal completely free for buyers" },
-          ].map((item) => (
-            <div key={item.title} className="rounded-xl border bg-card/50 p-6 text-left">
-              <item.icon className="h-8 w-8 text-primary mb-3" />
-              <h3 className="font-heading font-semibold text-lg">{item.title}</h3>
-              <p className="text-sm text-muted-foreground mt-1">{item.desc}</p>
+    <section className="relative overflow-hidden">
+      <div className="mx-auto max-w-[1440px] px-6 py-16 md:px-10 md:py-24">
+        <div className="flex flex-col items-start gap-12 lg:flex-row lg:items-center lg:gap-16">
+          <div className="w-full lg:w-1/2">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border-2 border-ink/10 bg-card px-4 py-1.5 text-sm font-medium text-ink/70">
+              <span className="size-2 rounded-full bg-mint" />
+              Independent B2B Tech Procurement
             </div>
-          ))}
+
+            <h1 className="font-display text-[clamp(2.4rem,6vw,4.5rem)] uppercase leading-[0.95] tracking-tight text-ink">
+              Fair tech deals.{" "}
+              <span className="text-pop">Clear scope.</span>{" "}
+              No surprises.
+            </h1>
+
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink/70">
+              REVWA protects companies from overpriced quotes and vague requirements.
+              We turn your needs into precise technical scopes and match you with the
+              right vendors — anonymously and fairly.
+            </p>
+
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Button asChild size="xl">
+                <Link to="/request">
+                  Start Free Request
+                  <ArrowRight className="ml-1 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="xl">
+                <Link to="/quote-audit">
+                  <FileSearch className="mr-1 h-5 w-5" />
+                  Audit Existing Quote
+                </Link>
+              </Button>
+            </div>
+
+            <div className="mt-8 flex items-center gap-3">
+              <div className="flex -space-x-2">
+                <span className="size-8 rounded-full border-2 border-paper bg-sky" />
+                <span className="size-8 rounded-full border-2 border-paper bg-mint" />
+                <span className="size-8 rounded-full border-2 border-paper bg-vio" />
+              </div>
+              <p className="text-sm font-medium text-ink/60">
+                First deal free for buyers
+              </p>
+            </div>
+          </div>
+
+          <div className="grid w-full gap-4 sm:grid-cols-3 lg:w-1/2 lg:grid-cols-1 xl:grid-cols-3">
+            {[
+              {
+                icon: Scale,
+                title: "Fair Pricing",
+                desc: "Anonymous RFQs force real competition",
+                bg: "bg-sky text-white",
+                body: "text-white/85",
+              },
+              {
+                icon: FileSearch,
+                title: "Clear Scope",
+                desc: "Professional tech requirements documents",
+                bg: "bg-sun text-ink",
+                body: "text-ink/80",
+              },
+              {
+                icon: Shield,
+                title: "Zero Commitment",
+                desc: "First deal completely free for buyers",
+                bg: "bg-mint text-ink",
+                body: "text-ink/80",
+              },
+            ].map((item) => (
+              <div key={item.title} className={`rounded-3xl p-6 ${item.bg}`}>
+                <item.icon className="mb-3 h-8 w-8 opacity-80" />
+                <h3 className="font-display text-lg uppercase">{item.title}</h3>
+                <p className={`mt-1 text-sm leading-relaxed ${item.body}`}>
+                  {item.desc}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

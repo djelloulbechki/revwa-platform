@@ -4,75 +4,90 @@
 
 @layer base {
   :root {
-    /* ===== LIGHT MODE (Default) ===== */
-    --background: 270 30% 97%;
-    --foreground: 270 50% 10%;
+    /* ===== Jolt-inspired palette (light) ===== */
+    --ink: 40 15% 15%;
+    --paper: 45 40% 97%;
+    --pop: 12 80% 55%;
+    --sky: 250 70% 50%;
+    --sun: 50 90% 65%;
+    --mint: 160 55% 65%;
+    --vio: 280 70% 50%;
 
-    --card: 270 20% 94%;
-    --card-foreground: 270 50% 10%;
+    --background: 45 40% 97%;
+    --foreground: 40 15% 15%;
 
-    --popover: 270 20% 94%;
-    --popover-foreground: 270 50% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 40 15% 15%;
 
-    --primary: 276 80% 50%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 40 15% 15%;
+
+    --primary: 12 80% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 270 20% 90%;
-    --secondary-foreground: 270 50% 15%;
+    --secondary: 50 90% 65%;
+    --secondary-foreground: 40 15% 15%;
 
-    --muted: 270 15% 92%;
-    --muted-foreground: 270 15% 45%;
+    --muted: 45 25% 93%;
+    --muted-foreground: 40 10% 40%;
 
-    --accent: 145 50% 45%;
+    --accent: 12 80% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 80% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 270 20% 85%;
-    --input: 270 20% 85%;
-    --ring: 276 80% 50%;
+    --border: 40 12% 88%;
+    --input: 40 12% 85%;
+    --ring: 12 80% 55%;
 
     --radius: 0.75rem;
 
-    --primary-glow: 276 100% 60%;
-    --primary-deep: 276 100% 30%;
-    --success: 145 50% 45%;
+    --primary-glow: 12 90% 60%;
+    --primary-deep: 12 80% 40%;
+    --success: 160 55% 40%;
   }
 
   .dark {
-    /* ===== DARK MODE ===== */
-    --background: 270 50% 5%;
-    --foreground: 0 0% 95%;
+    --ink: 45 30% 95%;
+    --paper: 40 20% 10%;
+    --pop: 12 80% 58%;
+    --sky: 250 70% 62%;
+    --sun: 50 85% 60%;
+    --mint: 160 50% 55%;
+    --vio: 280 65% 60%;
 
-    --card: 270 35% 10%;
-    --card-foreground: 0 0% 95%;
+    --background: 40 20% 10%;
+    --foreground: 45 30% 95%;
 
-    --popover: 270 35% 10%;
-    --popover-foreground: 0 0% 95%;
+    --card: 40 18% 14%;
+    --card-foreground: 45 30% 95%;
 
-    --primary: 276 100% 50%;
+    --popover: 40 18% 14%;
+    --popover-foreground: 45 30% 95%;
+
+    --primary: 12 80% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 270 20% 15%;
-    --secondary-foreground: 0 0% 95%;
+    --secondary: 50 70% 45%;
+    --secondary-foreground: 40 20% 10%;
 
-    --muted: 270 20% 15%;
-    --muted-foreground: 270 15% 55%;
+    --muted: 40 15% 18%;
+    --muted-foreground: 40 10% 65%;
 
-    --accent: 145 63% 49%;
+    --accent: 12 80% 58%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 80% 55%;
+    --destructive: 0 75% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 276 50% 25%;
-    --input: 276 50% 25%;
-    --ring: 276 100% 50%;
+    --border: 40 15% 22%;
+    --input: 40 15% 25%;
+    --ring: 12 80% 58%;
 
-    --primary-glow: 276 100% 60%;
-    --primary-deep: 276 100% 30%;
-    --success: 145 63% 49%;
+    --primary-glow: 12 90% 62%;
+    --primary-deep: 12 75% 35%;
+    --success: 160 50% 45%;
   }
 }
 
@@ -83,52 +98,65 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: "Exo 2", system-ui, sans-serif;
+    font-family: "Space Grotesk", system-ui, sans-serif;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: "Orbitron", system-ui, sans-serif;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Archivo Black", system-ui, sans-serif;
   }
 }
 
 @layer utilities {
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-[hsl(var(--primary-glow))];
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-pop to-sky;
   }
 
   .glow {
-    box-shadow: 0 0 20px -5px hsl(var(--primary-glow) / 0.35);
+    box-shadow: 0 6px 0 0 hsl(var(--sun));
   }
 
   .glow-lg {
-    box-shadow: 0 0 40px -10px hsl(var(--primary-glow) / 0.45);
+    box-shadow: 0 8px 0 0 hsl(var(--sun));
+  }
+
+  .btn-pop {
+    @apply rounded-full bg-pop font-bold text-white transition-all;
+    box-shadow: 0 6px 0 0 hsl(var(--sun));
+  }
+  .btn-pop:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 0 0 hsl(var(--sun));
+  }
+
+  .btn-ink {
+    @apply rounded-full border-2 border-ink bg-transparent font-bold text-ink transition-colors;
+  }
+  .btn-ink:hover {
+    @apply bg-ink text-paper;
   }
 }
 
-/* Neon service tags (Get Started) */
 @layer components {
   .neon-tag-idle {
-    border: 1px solid hsl(var(--border));
+    border: 2px solid hsl(var(--ink) / 0.1);
     background: hsl(var(--card));
     color: hsl(var(--muted-foreground));
   }
   .neon-tag-idle:hover {
-    border-color: hsl(var(--primary) / 0.45);
+    border-color: hsl(var(--pop) / 0.45);
     color: hsl(var(--foreground));
-    box-shadow: 0 0 12px -4px hsl(var(--primary-glow) / 0.35);
   }
   .neon-tag-active {
-    border: 1px solid hsl(var(--primary) / 0.7);
-    background: hsl(var(--primary) / 0.12);
-    color: hsl(var(--primary));
-    box-shadow:
-      0 0 14px -2px hsl(var(--primary-glow) / 0.55),
-      0 0 4px hsl(var(--primary-glow) / 0.35) inset;
+    border: 2px solid hsl(var(--pop) / 0.7);
+    background: hsl(var(--pop) / 0.1);
+    color: hsl(var(--pop));
   }
   .dark .neon-tag-active {
-    background: hsl(var(--primary) / 0.18);
-    box-shadow:
-      0 0 18px -2px hsl(var(--primary-glow) / 0.65),
-      0 0 6px hsl(var(--primary-glow) / 0.4) inset;
+    background: hsl(var(--pop) / 0.18);
   }
 }

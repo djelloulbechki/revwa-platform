@@ -4,28 +4,34 @@ import { ArrowRight } from "lucide-react"
 
 export function CTA() {
   return (
-    <section className="py-20 md:py-28">
-      <div className="container mx-auto px-4">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-[hsl(var(--primary-deep))] p-10 md:p-16 text-center text-white">
-          <h2 className="font-heading text-3xl md:text-5xl font-bold relative z-10">
-            Ready for a fair tech deal?
-          </h2>
-          <p className="mt-4 text-lg text-white/80 max-w-xl mx-auto relative z-10">
-            First project is completely free. No credit card. No commitment.
-          </p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center relative z-10">
-            <Button asChild size="lg" variant="secondary" className="text-base px-8">
-              <Link to="/request">
-                Start Free Request
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="text-base px-8 border-white/30 text-white hover:bg-white/10 hover:text-white">
-              <Link to="/quote-audit">
-                Audit a Quote for Free
-              </Link>
-            </Button>
-          </div>
+    <section className="mx-auto max-w-[1440px] px-6 pb-20 pt-8 md:px-10">
+      <div className="relative overflow-hidden rounded-4xl bg-ink px-8 py-16 text-center text-paper md:px-16">
+        <span className="absolute left-8 top-6 size-4 rounded-full bg-sky" />
+        <span className="absolute bottom-8 right-10 size-6 rounded-full bg-sun" />
+        <span className="absolute right-1/4 top-10 size-3 rounded-full bg-mint" />
+        <span className="absolute left-1/3 bottom-10 size-3 rounded-full bg-pop" />
+
+        <h2 className="relative z-10 font-display text-[clamp(2rem,6vw,4rem)] uppercase leading-[0.95]">
+          Ready for a <span className="text-sun">fair</span> tech deal?
+        </h2>
+        <p className="relative z-10 mx-auto mt-5 max-w-md text-paper/70">
+          First deal is free for buyers. No commitment. Clear scope. Real competition.
+        </p>
+        <div className="relative z-10 mt-8 flex flex-wrap items-center justify-center gap-4">
+          <Button asChild size="xl">
+            <Link to="/request">
+              Start Free Request
+              <ArrowRight className="ml-1 h-5 w-5" />
+            </Link>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            size="xl"
+            className="border-paper text-paper hover:bg-paper hover:text-ink"
+          >
+            <Link to="/quote-audit">Audit a quote</Link>
+          </Button>
         </div>
       </div>
     </section>

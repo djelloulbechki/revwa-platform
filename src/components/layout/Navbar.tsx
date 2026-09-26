@@ -1,125 +1,128 @@
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { ThemeToggle } from "./ThemeToggle"
-import { Menu, X, LogOut, LayoutDashboard } from "lucide-react"
+import { ThemeToggle } from "@/components/layout/ThemeToggle"
+import { Menu, X } from "lucide-react"
 import { useState } from "react"
 import { useAuth } from "@/hooks/useAuth"
 
 export function Navbar() {
   const [open, setOpen] = useState(false)
-  const { user, signOut, loading } = useAuth()
-  const navigate = useNavigate()
+  const location = useLocation()
+  const { user, signOut } = useAuth()
 
-  const handleSignOut = async () => {
-    await signOut()
-    navigate("/")
-  }
+  const isActive = (path: string) => location.pathname === path
+
+  const navLink = (to: string, label: string) => (
+    <Link
+      to={to}
+      onClick={() => setOpen(false)}
+      className={`text-sm font-bold transition-colors hover:text-pop ${
+        isActive(to) ? "text-pop underline decoration-2 underline-offset-4" : "text-ink/70"
+      }`}
+    >
+      {label}
+    </Link>
+  )
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+    <nav className="sticky top-0 z-50 border-b-2 border-ink/10 bg-paper/90 backdrop-blur-md">
+      <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-4 md:px-10">
         <Link to="/" className="flex items-center gap-2">
-          <span className="font-heading text-2xl font-bold tracking-tight text-primary">
+          <span className="inline-block size-3 rounded-full bg-pop" />
+          <span className="font-display text-xl uppercase tracking-tight text-ink">
             REVWA
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-          <Link to="/#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors">
+        <div className="hidden items-center gap-8 md:flex">
+          {navLink("/", "Home")}
+          {navLink("/request", "Get Started")}
+          {navLink("/quote-audit", "Quote Audit")}
+          <a
+            href="#how-it-works"
+            className="text-sm font-bold text-ink/70 transition-colors hover:text-pop"
+          >
             How it works
-          </Link>
-          <Link to="/quote-audit" className="text-muted-foreground hover:text-foreground transition-colors">
-            Quote Audit
-          </Link>
-          <Link to="/request" className="text-muted-foreground hover:text-foreground transition-colors">
-            Start Request
-          </Link>
-          {user && (
+          </a>
+        </div>
+
+        <div className="hidden items-center gap-3 md:flex">
+          <ThemeToggle />
+          {user ? (
             <>
-              <Link to="/buyer" className="text-muted-foreground hover:text-foreground transition-colors">
-                My Requests
-              </Link>
-              <Link to="/vendor" className="text-muted-foreground hover:text-foreground transition-colors">
-                Vendor Portal
-              </Link>
-              <Link to="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
-                Admin
-              </Link>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/buyer">Dashboard</Link>
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => signOut()}>
+                Sign out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/login">Log in</Link>
+              </Button>
+              <Button asChild size="sm">
+                <Link to="/request">Start free →</Link>
+              </Button>
             </>
           )}
-        </nav>
+        </div>
 
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-          {!loading && (
-            <>
+        <button
+          type="button"
+          className="inline-flex items-center justify-center rounded-full border-2 border-ink/10 p-2 md:hidden"
+          onClick={() => setOpen((v) => !v)}
+          aria-label="Toggle menu"
+        >
+          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
+      </div>
+
+      {open && (
+        <div className="border-t-2 border-ink/10 bg-paper px-6 py-4 md:hidden">
+          <div className="flex flex-col gap-4">
+            {navLink("/", "Home")}
+            {navLink("/request", "Get Started")}
+            {navLink("/quote-audit", "Quote Audit")}
+            <a
+              href="#how-it-works"
+              onClick={() => setOpen(false)}
+              className="text-sm font-bold text-ink/70"
+            >
+              How it works
+            </a>
+            <div className="flex flex-wrap items-center gap-3 border-t-2 border-ink/10 pt-4">
+              <ThemeToggle />
               {user ? (
                 <>
-                  <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
-                    <Link to="/buyer">
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                  <Button asChild variant="outline" size="sm">
+                    <Link to="/buyer" onClick={() => setOpen(false)}>
                       Dashboard
                     </Link>
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={handleSignOut} className="hidden sm:inline-flex">
-                    <LogOut className="mr-2 h-4 w-4" />
+                  <Button variant="ghost" size="sm" onClick={() => signOut()}>
                     Sign out
                   </Button>
                 </>
               ) : (
                 <>
-                  <Button asChild variant="ghost" className="hidden sm:inline-flex">
-                    <Link to="/login">Sign in</Link>
+                  <Button asChild variant="outline" size="sm">
+                    <Link to="/login" onClick={() => setOpen(false)}>
+                      Log in
+                    </Link>
                   </Button>
-                  <Button asChild className="hidden sm:inline-flex">
-                    <Link to="/request">Get Started</Link>
+                  <Button asChild size="sm">
+                    <Link to="/request" onClick={() => setOpen(false)}>
+                      Start free →
+                    </Link>
                   </Button>
                 </>
               )}
-            </>
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setOpen(!open)}
-            aria-label="Toggle Menu"
-          >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
-        </div>
-      </div>
-
-      {open && (
-        <div className="md:hidden border-t bg-background px-4 py-4 space-y-3">
-          <Link to="/#how-it-works" className="block text-sm" onClick={() => setOpen(false)}>How it works</Link>
-          <Link to="/quote-audit" className="block text-sm" onClick={() => setOpen(false)}>Quote Audit</Link>
-          <Link to="/request" className="block text-sm" onClick={() => setOpen(false)}>Start Request</Link>
-          {user && (
-            <>
-              <Link to="/buyer" className="block text-sm" onClick={() => setOpen(false)}>My Requests</Link>
-              <Link to="/vendor" className="block text-sm" onClick={() => setOpen(false)}>Vendor Portal</Link>
-              <Link to="/admin" className="block text-sm" onClick={() => setOpen(false)}>Admin</Link>
-            </>
-          )}
-          <div className="flex gap-2 pt-2">
-            {user ? (
-              <Button variant="outline" size="sm" className="flex-1" onClick={() => { handleSignOut(); setOpen(false) }}>
-                Sign out
-              </Button>
-            ) : (
-              <>
-                <Button asChild variant="outline" size="sm" className="flex-1">
-                  <Link to="/login" onClick={() => setOpen(false)}>Sign in</Link>
-                </Button>
-                <Button asChild size="sm" className="flex-1">
-                  <Link to="/request" onClick={() => setOpen(false)}>Get Started</Link>
-                </Button>
-              </>
-            )}
+            </div>
           </div>
         </div>
       )}
-    </header>
+    </nav>
   )
 }

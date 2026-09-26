@@ -1,15 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ["class"],
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       fontFamily: {
-        heading: ["Orbitron", "sans-serif"],
-        body: ["Exo 2", "sans-serif"],
+        display: ['"Archivo Black"', "system-ui", "sans-serif"],
+        body: ['"Space Grotesk"', "system-ui", "sans-serif"],
+        heading: ['"Archivo Black"', "system-ui", "sans-serif"],
+        sans: ['"Space Grotesk"', "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -17,6 +16,13 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        ink: "hsl(var(--ink))",
+        paper: "hsl(var(--paper))",
+        pop: "hsl(var(--pop))",
+        sky: "hsl(var(--sky))",
+        sun: "hsl(var(--sun))",
+        mint: "hsl(var(--mint))",
+        vio: "hsl(var(--vio))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -53,10 +59,16 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        "2xl": "1.25rem",
+        "3xl": "1.75rem",
+        "4xl": "2.5rem",
       },
       boxShadow: {
-        glow: "0 0 20px -5px hsl(var(--primary-glow) / 0.35)",
-        "glow-lg": "0 0 40px -10px hsl(var(--primary-glow) / 0.45)",
+        glow: "0 6px 0 0 hsl(var(--sun))",
+        "glow-lg": "0 8px 0 0 hsl(var(--sun))",
+        pop: "0 6px 0 0 hsl(var(--sun))",
+        "pop-lg": "0 8px 0 0 hsl(var(--sun))",
+        ink: "0 6px 0 0 hsl(var(--ink))",
       },
       keyframes: {
         "accordion-down": {

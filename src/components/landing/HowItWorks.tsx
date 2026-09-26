@@ -2,51 +2,53 @@ import { MessageSquare, FileText, Send, Trophy } from "lucide-react"
 
 const steps = [
   {
-    icon: MessageSquare,
-    title: "1. Tell us what you need",
+    n: "01",
+    title: "Tell us what you need",
     desc: "Describe your project in text or voice. No technical jargon required.",
+    className: "bg-sky text-white",
+    bodyClass: "text-white/85",
   },
   {
-    icon: FileText,
-    title: "2. We create a clear scope",
+    n: "02",
+    title: "We create a clear scope",
     desc: "Our team turns your needs into a precise technical requirements document.",
+    className: "bg-sun text-ink",
+    bodyClass: "text-ink/80",
   },
   {
-    icon: Send,
-    title: "3. Anonymous RFQ",
+    n: "03",
+    title: "Anonymous RFQ",
     desc: "We send the scoped request to qualified vendors without revealing your identity.",
+    className: "bg-mint text-ink",
+    bodyClass: "text-ink/80",
   },
   {
-    icon: Trophy,
-    title: "4. Choose the best offer",
+    n: "04",
+    title: "Choose the best offer",
     desc: "Compare shortlisted proposals side-by-side and pick the right partner.",
+    className: "bg-vio text-white",
+    bodyClass: "text-white/85",
   },
 ]
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-20 md:py-28 bg-muted/40">
-      <div className="container mx-auto px-4">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="font-heading text-3xl md:text-4xl font-bold">How REVWA works</h2>
-          <p className="mt-4 text-muted-foreground text-lg">
-            From messy ideas to clear, competitive proposals — in four simple steps.
-          </p>
-        </div>
+    <section
+      id="how-it-works"
+      className="mx-auto max-w-[1440px] border-t-2 border-ink/10 px-6 py-16 md:px-10 md:py-20"
+    >
+      <h2 className="mb-10 font-display text-[clamp(1.8rem,4vw,3rem)] uppercase text-ink">
+        How <span className="text-pop">REVWA</span> works
+      </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {steps.map((step, i) => (
-            <div key={i} className="relative">
-              <div className="rounded-2xl border bg-card p-6 h-full hover:shadow-glow transition-shadow">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary mb-4">
-                  <step.icon className="h-6 w-6" />
-                </div>
-                <h3 className="font-heading font-semibold text-lg mb-2">{step.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {steps.map((s) => (
+          <div key={s.n} className={`rounded-3xl p-7 ${s.className}`}>
+            <span className="font-display text-5xl opacity-40">{s.n}</span>
+            <h3 className="mb-2 mt-3 font-display text-xl uppercase">{s.title}</h3>
+            <p className={`leading-relaxed ${s.bodyClass}`}>{s.desc}</p>
+          </div>
+        ))}
       </div>
     </section>
   )
