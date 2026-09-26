@@ -72,7 +72,7 @@ export function Navbar() {
                     <Link to="/login">Sign in</Link>
                   </Button>
                   <Button asChild className="hidden sm:inline-flex">
-                    <Link to="/signup">Get Started</Link>
+                    <Link to="/request">Get Started</Link>
                   </Button>
                 </>
               )}
@@ -113,7 +113,7 @@ export function Navbar() {
                   <Link to="/login" onClick={() => setOpen(false)}>Sign in</Link>
                 </Button>
                 <Button asChild size="sm" className="flex-1">
-                  <Link to="/signup" onClick={() => setOpen(false)}>Get Started</Link>
+                  <Link to="/request" onClick={() => setOpen(false)}>Get Started</Link>
                 </Button>
               </>
             )}

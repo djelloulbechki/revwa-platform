@@ -104,3 +104,31 @@
     box-shadow: 0 0 40px -10px hsl(var(--primary-glow) / 0.45);
   }
 }
+
+/* Neon service tags (Get Started) */
+@layer components {
+  .neon-tag-idle {
+    border: 1px solid hsl(var(--border));
+    background: hsl(var(--card));
+    color: hsl(var(--muted-foreground));
+  }
+  .neon-tag-idle:hover {
+    border-color: hsl(var(--primary) / 0.45);
+    color: hsl(var(--foreground));
+    box-shadow: 0 0 12px -4px hsl(var(--primary-glow) / 0.35);
+  }
+  .neon-tag-active {
+    border: 1px solid hsl(var(--primary) / 0.7);
+    background: hsl(var(--primary) / 0.12);
+    color: hsl(var(--primary));
+    box-shadow:
+      0 0 14px -2px hsl(var(--primary-glow) / 0.55),
+      0 0 4px hsl(var(--primary-glow) / 0.35) inset;
+  }
+  .dark .neon-tag-active {
+    background: hsl(var(--primary) / 0.18);
+    box-shadow:
+      0 0 18px -2px hsl(var(--primary-glow) / 0.65),
+      0 0 6px hsl(var(--primary-glow) / 0.4) inset;
+  }
+}
