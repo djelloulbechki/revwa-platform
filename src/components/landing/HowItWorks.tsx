@@ -3,29 +3,29 @@ const steps = [
     n: "01",
     title: "Tell us what you need",
     desc: "Describe your project in text or voice. No technical jargon required.",
-    className: "bg-sky text-white",
-    bodyClass: "text-white/85",
+    className: "bg-sun text-white",
+    bodyClass: "text-white/90",
   },
   {
     n: "02",
     title: "We create a clear scope",
     desc: "Our team turns your needs into a precise technical requirements document.",
-    className: "bg-sun text-white",
-    bodyClass: "text-white/85",
+    className: "bg-sky text-white",
+    bodyClass: "text-white/90",
   },
   {
     n: "03",
     title: "Anonymous RFQ",
     desc: "We send the scoped request to qualified vendors without revealing your identity.",
-    className: "bg-mint text-white",
-    bodyClass: "text-white/85",
+    className: "bg-pop text-white",
+    bodyClass: "text-white/90",
   },
   {
     n: "04",
     title: "Choose the best offer",
     desc: "Compare shortlisted proposals side-by-side and pick the right partner.",
-    className: "bg-vio text-white",
-    bodyClass: "text-white/85",
+    className: "bg-mint text-white",
+    bodyClass: "text-white/90",
   },
 ]
 
@@ -41,9 +41,14 @@ export function HowItWorks() {
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {steps.map((s) => (
-          <div key={s.n} className={`rounded-3xl p-7 ${s.className}`}>
+          <div
+            key={s.n}
+            className={`rounded-3xl p-7 shadow-[0_8px_0_0_rgba(0,0,0,0.12)] ${s.className}`}
+          >
             <span className="font-display text-5xl opacity-40">{s.n}</span>
-            <h3 className="mb-2 mt-3 font-display text-xl uppercase">{s.title}</h3>
+            <h3 className="mb-2 mt-3 font-display text-xl uppercase tracking-wide">
+              {s.title}
+            </h3>
             <p className={`leading-relaxed ${s.bodyClass}`}>{s.desc}</p>
           </div>
         ))}
