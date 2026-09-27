@@ -106,8 +106,8 @@ export default function VendorOnboardingComplete() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-3">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      <p className="text-sm text-muted-foreground">{msg}</p>
+      <Loader2 className="h-8 w-8 animate-spin text-pop" />
+      <p className="text-sm text-ink/60">{msg}</p>
     </div>
   )
 }

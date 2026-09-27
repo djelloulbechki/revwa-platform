@@ -112,13 +112,13 @@ export default function BuyerDashboard() {
   ).length
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-paper font-body text-ink">
       <Navbar />
-      <main className="flex-1 container mx-auto px-4 py-10">
+      <main className="flex-1 mx-auto max-w-[1440px] px-6 md:px-10 py-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="font-heading text-3xl font-bold">My Requests</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className="font-display text-3xl font-bold">My Requests</h1>
+            <p className="text-ink/60 mt-1">
               Track and manage your tech procurement requests
             </p>
           </div>
@@ -133,8 +133,8 @@ export default function BuyerDashboard() {
         {!user && !authLoading && (
           <Card className="mb-8 border-dashed">
             <CardContent className="py-8 text-center space-y-3">
-              <AlertCircle className="h-8 w-8 mx-auto text-muted-foreground" />
-              <p className="text-muted-foreground">
+              <AlertCircle className="h-8 w-8 mx-auto text-ink/60" />
+              <p className="text-ink/60">
                 Sign in to see your requests, or submit a new one to create your workspace.
               </p>
               <div className="flex justify-center gap-3">
@@ -153,34 +153,34 @@ export default function BuyerDashboard() {
           <Card>
             <CardHeader className="pb-2">
               <CardDescription>Total</CardDescription>
-              <CardTitle className="text-3xl font-heading">{requests.length}</CardTitle>
+              <CardTitle className="text-3xl font-display">{requests.length}</CardTitle>
             </CardHeader>
-            <CardContent className="text-sm text-muted-foreground flex items-center gap-2">
+            <CardContent className="text-sm text-ink/60 flex items-center gap-2">
               <FileText className="h-4 w-4" /> All requests
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
               <CardDescription>In progress</CardDescription>
-              <CardTitle className="text-3xl font-heading">{active}</CardTitle>
+              <CardTitle className="text-3xl font-display">{active}</CardTitle>
             </CardHeader>
-            <CardContent className="text-sm text-muted-foreground flex items-center gap-2">
+            <CardContent className="text-sm text-ink/60 flex items-center gap-2">
               <Clock className="h-4 w-4" /> Active pipeline
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
               <CardDescription>Closed</CardDescription>
-              <CardTitle className="text-3xl font-heading">{completed}</CardTitle>
+              <CardTitle className="text-3xl font-display">{completed}</CardTitle>
             </CardHeader>
-            <CardContent className="text-sm text-muted-foreground flex items-center gap-2">
+            <CardContent className="text-sm text-ink/60 flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4" /> Won / lost / archived
             </CardContent>
           </Card>
         </div>
 
         {error && (
-          <div className="mb-6 rounded-lg border border-destructive/30 bg-destructive/10 text-destructive text-sm p-3">
+          <div className="mb-6 rounded-2xl border-2 border-destructive/30 bg-destructive/10 text-destructive text-sm p-3">
             {error}
             <p className="mt-1 text-xs opacity-80">
               Check RLS policies and that migration 002 was applied.
@@ -190,12 +190,12 @@ export default function BuyerDashboard() {
 
         {loading || authLoading ? (
           <div className="flex justify-center py-16">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <Loader2 className="h-8 w-8 animate-spin text-pop" />
           </div>
         ) : requests.length === 0 && user ? (
           <Card className="border-dashed">
             <CardContent className="py-12 text-center space-y-3">
-              <p className="text-muted-foreground">No requests yet for this account.</p>
+              <p className="text-ink/60">No requests yet for this account.</p>
               <Button asChild>
                 <Link to="/request">Submit your first request</Link>
               </Button>
@@ -213,12 +213,12 @@ export default function BuyerDashboard() {
                   <CardContent className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="space-y-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-heading font-semibold truncate">
+                        <h3 className="font-display font-semibold truncate">
                           {displayTitle(r)}
                         </h3>
                         <Badge variant={st.variant}>{st.label}</Badge>
                       </div>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-ink/60">
                         {r.submitted_at || r.created_at
                           ? new Date(r.submitted_at || r.created_at).toLocaleString()
                           : ""}
@@ -226,7 +226,7 @@ export default function BuyerDashboard() {
                         {` · ${formatBudget(r)}`}
                       </p>
                       {r.main_pain_points && r.main_pain_points.length > 0 && (
-                        <p className="text-xs text-muted-foreground truncate">
+                        <p className="text-xs text-ink/60 truncate">
                           {r.main_pain_points.slice(0, 5).join(" · ")}
                         </p>
                       )}

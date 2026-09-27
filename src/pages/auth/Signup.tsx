@@ -20,10 +20,6 @@ export default function Signup() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters")
-      return
-    }
     setLoading(true)
     const { error } = await signUp(email, password, fullName)
     setLoading(false)
@@ -35,33 +31,34 @@ export default function Signup() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col bg-paper font-body text-ink">
       <Navbar />
-      <main className="flex-1 flex items-center justify-center px-4 py-12">
+      <main className="flex flex-1 items-center justify-center px-6 py-16">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle className="font-heading text-2xl">Create account</CardTitle>
-            <CardDescription>Start your first free request with REVWA</CardDescription>
+            <div className="mx-auto mb-2 size-3 rounded-full bg-sun" />
+            <CardTitle>Create account</CardTitle>
+            <CardDescription>Start matching with the right tech vendors</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
-                <div className="rounded-md bg-destructive/10 text-destructive text-sm p-3">
+                <div className="rounded-2xl border-2 border-destructive/30 bg-destructive/10 p-3 text-sm font-medium text-destructive">
                   {error}
                 </div>
               )}
               <div className="space-y-2">
-                <Label htmlFor="fullName">Full name</Label>
+                <Label htmlFor="name">Full name</Label>
                 <Input
-                  id="fullName"
-                  placeholder="Ahmed Al-Rashid"
+                  id="name"
+                  placeholder="Jane Doe"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Work email</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -76,20 +73,19 @@ export default function Signup() {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Min. 6 characters"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  minLength={6}
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Create account
+              <Button type="submit" className="w-full" size="lg" disabled={loading}>
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Create account →"}
               </Button>
             </form>
-            <p className="mt-6 text-center text-sm text-muted-foreground">
+            <p className="mt-6 text-center text-sm text-ink/60">
               Already have an account?{" "}
-              <Link to="/login" className="text-primary hover:underline font-medium">
+              <Link to="/login" className="font-bold text-pop underline decoration-2 underline-offset-4">
                 Sign in
               </Link>
             </p>

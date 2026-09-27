@@ -30,18 +30,19 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col bg-paper font-body text-ink">
       <Navbar />
-      <main className="flex-1 flex items-center justify-center px-4 py-12">
+      <main className="flex flex-1 items-center justify-center px-6 py-16">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle className="font-heading text-2xl">Welcome back</CardTitle>
+            <div className="mx-auto mb-2 size-3 rounded-full bg-pop shadow-[0_0_10px_hsl(var(--primary-glow)/0.6)]" />
+            <CardTitle>Welcome back</CardTitle>
             <CardDescription>Sign in to your REVWA account</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
-                <div className="rounded-md bg-destructive/10 text-destructive text-sm p-3">
+                <div className="rounded-2xl border-2 border-destructive/30 bg-destructive/10 p-3 text-sm font-medium text-destructive">
                   {error}
                 </div>
               )}
@@ -66,14 +67,13 @@ export default function Login() {
                   required
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Sign in
+              <Button type="submit" className="w-full" size="lg" disabled={loading}>
+                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign in →"}
               </Button>
             </form>
-            <p className="mt-6 text-center text-sm text-muted-foreground">
-              Don't have an account?{" "}
-              <Link to="/signup" className="text-primary hover:underline font-medium">
+            <p className="mt-6 text-center text-sm text-ink/60">
+              No account?{" "}
+              <Link to="/signup" className="font-bold text-pop underline decoration-2 underline-offset-4">
                 Sign up
               </Link>
             </p>

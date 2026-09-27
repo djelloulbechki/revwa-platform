@@ -314,22 +314,22 @@ export default function Request() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="flex min-h-screen bg-paper font-body text-ink flex-col bg-paper font-body text-ink">
       <Navbar />
 
-      <main className="flex-1 container mx-auto px-4 py-10 max-w-3xl">
+      <main className="flex-1 mx-auto max-w-[1440px] px-6 md:px-10 py-10 max-w-3xl">
         {/* ——— FORM ——— */}
         {step === "form" && (
           <>
             <div className="mb-8 text-center">
-              <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs text-primary mb-4">
+              <div className="inline-flex items-center gap-2 rounded-full border border-pop/30 bg-pop/5 px-3 py-1 text-xs text-pop mb-4">
                 <Sparkles className="h-3.5 w-3.5" />
                 Submit first — secure your workspace after
               </div>
-              <h1 className="font-heading text-3xl md:text-4xl font-bold tracking-tight">
+              <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight">
                 What do you need built?
               </h1>
-              <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
+              <p className="mt-3 text-ink/60 max-w-xl mx-auto">
                 Describe your project. We’ll create a clear scope and contact you
                 on the email you provide.
               </p>
@@ -337,12 +337,12 @@ export default function Request() {
 
             <form onSubmit={handleSubmit} className="space-y-8">
               {error && (
-                <div className="rounded-lg border border-destructive/30 bg-destructive/10 text-destructive text-sm p-3">
+                <div className="rounded-2xl border-2 border-destructive/30 bg-destructive/10 text-destructive text-sm p-3">
                   {error}
                 </div>
               )}
 
-              <Card className="border-primary/10 shadow-sm">
+              <Card className="border-pop/10 shadow-sm">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg">Tell us what you need</CardTitle>
                   <CardDescription>
@@ -401,7 +401,7 @@ export default function Request() {
               </Card>
 
               {/* Contact email — required */}
-              <Card className="border-primary/10">
+              <Card className="border-pop/10">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg">How can we reach you?</CardTitle>
                   <CardDescription>
@@ -428,13 +428,13 @@ export default function Request() {
               {/* Neon tags */}
               <div className="space-y-4">
                 <div>
-                  <h2 className="font-heading text-lg font-semibold">
+                  <h2 className="font-display text-lg font-semibold">
                     Tag services{" "}
-                    <span className="text-muted-foreground font-normal text-sm">
+                    <span className="text-ink/60 font-normal text-sm">
                       (optional)
                     </span>
                   </h2>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-sm text-ink/60 mt-1">
                     Tap anything that fits — helps us route your request faster.
                   </p>
                 </div>
@@ -442,7 +442,7 @@ export default function Request() {
                 <div className="space-y-5">
                   {SERVICE_GROUPS.map((group) => (
                     <div key={group.title}>
-                      <p className="text-xs font-semibold uppercase tracking-wider text-primary/80 mb-2">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-pop/80 mb-2">
                         {group.title}
                       </p>
                       <div className="flex flex-wrap gap-2">
@@ -477,7 +477,7 @@ export default function Request() {
                 Submit free request
               </Button>
 
-              <p className="text-center text-xs text-muted-foreground">
+              <p className="text-center text-xs text-ink/60">
                 By submitting you agree to our{" "}
                 <Link to="/terms" className="underline hover:text-foreground">
                   Terms
@@ -495,11 +495,11 @@ export default function Request() {
         {/* ——— SUBMITTING ——— */}
         {step === "submitting" && (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
-            <Loader2 className="h-10 w-10 animate-spin text-primary" />
-            <p className="font-heading text-lg font-semibold">
+            <Loader2 className="h-10 w-10 animate-spin text-pop" />
+            <p className="font-display text-lg font-semibold">
               Creating your workspace…
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-ink/60">
               Saving your request securely
             </p>
           </div>
@@ -512,17 +512,17 @@ export default function Request() {
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-success/15 text-success">
                 <CheckCircle2 className="h-7 w-7" />
               </div>
-              <h1 className="font-heading text-2xl md:text-3xl font-bold">
+              <h1 className="font-display text-2xl md:text-3xl font-bold">
                 Your request has been received
               </h1>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+              <p className="text-ink/60 text-sm leading-relaxed">
                 We’ve created your workspace.
               </p>
-              <div className="inline-flex flex-col items-center gap-1 rounded-xl border bg-card px-5 py-3 text-sm">
-                <span className="text-muted-foreground text-xs uppercase tracking-wide">
+              <div className="inline-flex flex-col items-center gap-1 rounded-3xl border-2 border-ink/10 bg-card px-5 py-3 text-sm">
+                <span className="text-ink/60 text-xs uppercase tracking-wide">
                   Request
                 </span>
-                <span className="font-heading font-semibold text-lg">
+                <span className="font-display font-semibold text-lg">
                   #{requestRef}
                 </span>
                 <span className="text-xs text-success font-medium">
@@ -531,9 +531,9 @@ export default function Request() {
               </div>
             </div>
 
-            <Card className="border-primary/20 shadow-glow">
+            <Card className="border-pop/20 shadow-glow">
               <CardHeader className="pb-2">
-                <div className="flex items-center gap-2 text-primary mb-1">
+                <div className="flex items-center gap-2 text-pop mb-1">
                   <Shield className="h-4 w-4" />
                   <span className="text-xs font-semibold uppercase tracking-wide">
                     Secure your workspace
@@ -550,7 +550,7 @@ export default function Request() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {claimMessage && (
-                  <div className="rounded-md bg-muted text-sm p-3 text-muted-foreground">
+                  <div className="rounded-md bg-muted text-sm p-3 text-ink/60">
                     {claimMessage}
                   </div>
                 )}
@@ -606,7 +606,7 @@ export default function Request() {
                     <span className="w-full border-t" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-card px-2 text-muted-foreground">
+                    <span className="bg-card px-2 text-ink/60">
                       or use your contact email
                     </span>
                   </div>
@@ -652,7 +652,7 @@ export default function Request() {
                 <Button
                   asChild
                   variant="ghost"
-                  className="w-full text-muted-foreground"
+                  className="w-full text-ink/60"
                 >
                   <Link to="/buyer">Skip for now — go to dashboard</Link>
                 </Button>

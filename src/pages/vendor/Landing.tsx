@@ -97,22 +97,22 @@ export default function VendorLanding() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-paper font-body text-ink">
       <Navbar />
 
       <main className="flex-1">
         {/* Hero */}
         <section className="relative overflow-hidden border-b">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 pointer-events-none" />
-          <div className="container mx-auto px-4 py-16 md:py-24 max-w-4xl relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-pop/10 via-transparent to-sun/5 pointer-events-none" />
+          <div className="mx-auto max-w-[1440px] px-6 md:px-10 py-16 md:py-24 max-w-4xl relative">
             <div className="text-center space-y-5">
-              <Badge variant="outline" className="border-primary/40 text-primary">
+              <Badge variant="outline" className="border-pop/40 text-pop">
                 Invite-only partner network
               </Badge>
-              <h1 className="font-heading text-3xl md:text-5xl font-bold tracking-tight">
+              <h1 className="font-display text-3xl md:text-5xl uppercase tracking-tight">
                 For digital service providers
               </h1>
-              <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+              <p className="text-ink/60 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
                 REVWA connects vetted software and digital agencies with buyers who
                 already have a clear scope — so you receive{" "}
                 <span className="text-foreground font-medium">qualified leads</span>,
@@ -142,11 +142,11 @@ export default function VendorLanding() {
               ].map((item) => (
                 <div
                   key={item.title}
-                  className="rounded-xl border bg-card/60 p-5 text-left"
+                  className="rounded-3xl border-2 border-ink/10 bg-card p-5 text-left shadow-[0_6px_0_0_rgba(0,0,0,0.08)]"
                 >
-                  <item.icon className="h-6 w-6 text-primary mb-3" />
-                  <h3 className="font-heading font-semibold">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{item.desc}</p>
+                  <item.icon className="h-6 w-6 text-pop mb-3" />
+                  <h3 className="font-display font-semibold">{item.title}</h3>
+                  <p className="text-sm text-ink/60 mt-1">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -154,8 +154,8 @@ export default function VendorLanding() {
         </section>
 
         {/* Markets */}
-        <section className="container mx-auto px-4 py-12 max-w-4xl">
-          <h2 className="font-heading text-lg font-semibold text-center mb-4">
+        <section className="mx-auto max-w-[1440px] px-6 md:px-10 py-12 max-w-4xl">
+          <h2 className="font-display text-lg font-semibold text-center mb-4">
             Active partner markets
           </h2>
           <div className="flex flex-wrap justify-center gap-2">
@@ -168,13 +168,13 @@ export default function VendorLanding() {
         </section>
 
         {/* Invite gate */}
-        <section className="container mx-auto px-4 pb-20 max-w-md">
-          <Card className="border-primary/20 shadow-glow">
+        <section className="mx-auto max-w-[1440px] px-6 md:px-10 pb-20 max-w-md">
+          <Card className="border-pop/25">
             <CardHeader className="text-center">
-              <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-pop/10 text-pop">
                 <KeyRound className="h-6 w-6" />
               </div>
-              <CardTitle className="font-heading text-xl">Partner access</CardTitle>
+              <CardTitle className="font-display text-xl">Partner access</CardTitle>
               <CardDescription>
                 Enter the invitation code provided by REVWA to create your vendor
                 account. Already a partner? Sign in below.
@@ -195,7 +195,7 @@ export default function VendorLanding() {
                 </div>
 
                 {error && (
-                  <div className="rounded-lg border border-destructive/30 bg-destructive/10 text-destructive text-sm p-3 leading-relaxed">
+                  <div className="rounded-2xl border-2 border-destructive/30 bg-destructive/10 text-destructive text-sm p-3 leading-relaxed">
                     {error}
                   </div>
                 )}
@@ -215,7 +215,7 @@ export default function VendorLanding() {
                   <span className="w-full border-t" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">or</span>
+                  <span className="bg-card px-2 text-ink/60">or</span>
                 </div>
               </div>
 
@@ -223,11 +223,11 @@ export default function VendorLanding() {
                 <Link to="/vendor/login">I already have a partner account — Sign in</Link>
               </Button>
 
-              <p className="text-center text-xs text-muted-foreground leading-relaxed pt-2">
+              <p className="text-center text-xs text-ink/60 leading-relaxed pt-2">
                 Don’t have an invitation code? Apply to join our partner network:{" "}
                 <a
                   href="mailto:ai@revwa.com?subject=Vendor%20partner%20application"
-                  className="text-primary font-medium hover:underline"
+                  className="text-pop font-medium hover:underline"
                 >
                   ai@revwa.com
                 </a>
@@ -235,14 +235,14 @@ export default function VendorLanding() {
             </CardContent>
           </Card>
 
-          <ul className="mt-8 space-y-2 text-sm text-muted-foreground max-w-md mx-auto">
+          <ul className="mt-8 space-y-2 text-sm text-ink/60 max-w-md mx-auto">
             {[
               "Companies only — agencies, studios, and digital service firms",
               "Clear scopes and serious buyers, not open-ended browsing",
               "Transparent engagement terms preferred on both sides",
             ].map((t) => (
               <li key={t} className="flex gap-2">
-                <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                <CheckCircle2 className="h-4 w-4 text-pop shrink-0 mt-0.5" />
                 <span>{t}</span>
               </li>
             ))}
@@ -250,8 +250,8 @@ export default function VendorLanding() {
         </section>
       </main>
 
-      <footer className="border-t py-8 text-center text-sm text-muted-foreground">
-        <div className="container mx-auto px-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+      <footer className="border-t py-8 text-center text-sm text-ink/60">
+        <div className="mx-auto max-w-[1440px] px-6 md:px-10 flex flex-col sm:flex-row items-center justify-center gap-3">
           <span className="inline-flex items-center gap-1">
             <Building2 className="h-3.5 w-3.5" />
             REVWA Partner Network

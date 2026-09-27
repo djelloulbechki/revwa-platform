@@ -123,18 +123,18 @@ export default function AdminScoping() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-paper font-body text-ink">
       <Navbar />
-      <main className="flex-1 container mx-auto px-4 py-10">
+      <main className="flex-1 mx-auto max-w-[1440px] px-6 md:px-10 py-10">
         <div className="mb-8">
-          <h1 className="font-heading text-3xl font-bold">Admin · Scoping</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="font-display text-3xl font-bold">Admin · Scoping</h1>
+          <p className="text-ink/60 mt-1">
             Review submitted requests and draft scope documents
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 rounded-lg border border-destructive/30 bg-destructive/10 text-destructive text-sm p-3 flex gap-2">
+          <div className="mb-6 rounded-2xl border-2 border-destructive/30 bg-destructive/10 text-destructive text-sm p-3 flex gap-2">
             <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
             <div>
               <p>{error}</p>
@@ -147,17 +147,17 @@ export default function AdminScoping() {
 
         {loading || authLoading ? (
           <div className="flex justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <Loader2 className="h-8 w-8 animate-spin text-pop" />
           </div>
         ) : (
           <div className="grid lg:grid-cols-5 gap-6">
             <div className="lg:col-span-2 space-y-2">
-              <p className="text-xs font-semibold uppercase text-muted-foreground mb-2">
+              <p className="text-xs font-semibold uppercase text-ink/60 mb-2">
                 Queue ({list.length})
               </p>
               {list.length === 0 ? (
                 <Card>
-                  <CardContent className="py-8 text-center text-sm text-muted-foreground">
+                  <CardContent className="py-8 text-center text-sm text-ink/60">
                     No submitted requests in queue.
                   </CardContent>
                 </Card>
@@ -167,9 +167,9 @@ export default function AdminScoping() {
                     key={r.id}
                     type="button"
                     onClick={() => setSelected(r)}
-                    className={`w-full text-left rounded-xl border p-3 transition-colors ${
+                    className={`w-full text-left rounded-3xl border-2 border-ink/10 p-3 transition-colors ${
                       selected?.id === r.id
-                        ? "border-primary bg-primary/5"
+                        ? "border-primary bg-pop/5"
                         : "hover:border-primary/30"
                     }`}
                   >
@@ -181,7 +181,7 @@ export default function AdminScoping() {
                         {r.status}
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1 truncate">
+                    <p className="text-xs text-ink/60 mt-1 truncate">
                       {r.contact_email || "—"} ·{" "}
                       {new Date(r.submitted_at || r.created_at).toLocaleDateString()}
                     </p>
@@ -193,7 +193,7 @@ export default function AdminScoping() {
             <div className="lg:col-span-3">
               {!selected ? (
                 <Card>
-                  <CardContent className="py-16 text-center text-muted-foreground">
+                  <CardContent className="py-16 text-center text-ink/60">
                     Select a request
                   </CardContent>
                 </Card>
@@ -259,7 +259,7 @@ export default function AdminScoping() {
                         />
                       </div>
                       {saveMsg && (
-                        <p className="text-sm text-muted-foreground">{saveMsg}</p>
+                        <p className="text-sm text-ink/60">{saveMsg}</p>
                       )}
                       <Button onClick={handleCreateScope} disabled={saving}>
                         {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

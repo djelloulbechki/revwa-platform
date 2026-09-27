@@ -5,24 +5,24 @@ import { Navbar } from "@/components/layout/Navbar"
 
 export default function PrivacyPolicy() {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-paper font-body text-ink">
       <Navbar />
 
-      <main className="flex-1 container mx-auto px-4 py-12 max-w-3xl">
+      <main className="flex-1 mx-auto max-w-[1440px] px-6 md:px-10 py-12 max-w-3xl">
         <div className="mb-10">
-          <p className="text-sm text-muted-foreground mb-2">Legal</p>
-          <h1 className="font-heading text-3xl md:text-4xl font-bold tracking-tight">
+          <p className="text-sm text-ink/60 mb-2">Legal</p>
+          <h1 className="font-display text-3xl md:text-4xl font-bold tracking-tight">
             Privacy Policy
           </h1>
-          <p className="mt-3 text-muted-foreground">
+          <p className="mt-3 text-ink/60">
             Last updated: September 25, 2026
           </p>
         </div>
 
-        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8 text-foreground">
+        <div className="prose prose-headings:font-display prose prose-headings:font-display-neutral dark:prose prose-headings:font-display-invert max-w-none space-y-8 text-foreground">
           <section className="space-y-3">
-            <h2 className="font-heading text-xl font-semibold">1. Introduction</h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <h2 className="font-display text-xl font-semibold">1. Introduction</h2>
+            <p className="text-ink/60 leading-relaxed">
               REVWA (“we”, “us”, or “our”) operates an independent B2B tech procurement
               platform that helps companies define technical requirements, run anonymous
               RFQs, and compare vendor proposals fairly. This Privacy Policy explains how
@@ -32,9 +32,9 @@ export default function PrivacyPolicy() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-heading text-xl font-semibold">2. Information We Collect</h2>
-            <p className="text-muted-foreground leading-relaxed">We may collect:</p>
-            <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-1">
+            <h2 className="font-display text-xl font-semibold">2. Information We Collect</h2>
+            <p className="text-ink/60 leading-relaxed">We may collect:</p>
+            <ul className="list-disc list-inside text-ink/60 space-y-2 ml-1">
               <li>
                 <strong className="text-foreground">Account information:</strong> name,
                 email address, company name, phone number, and password.
@@ -60,9 +60,9 @@ export default function PrivacyPolicy() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-heading text-xl font-semibold">3. How We Use Your Information</h2>
-            <p className="text-muted-foreground leading-relaxed">We use your information to:</p>
-            <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-1">
+            <h2 className="font-display text-xl font-semibold">3. How We Use Your Information</h2>
+            <p className="text-ink/60 leading-relaxed">We use your information to:</p>
+            <ul className="list-disc list-inside text-ink/60 space-y-2 ml-1">
               <li>Create and manage your account</li>
               <li>Process project requests, scope documents, RFQs, and proposals</li>
               <li>Match buyers with relevant vendors (while keeping buyer identity anonymous during RFQ)</li>
@@ -74,8 +74,8 @@ export default function PrivacyPolicy() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-heading text-xl font-semibold">4. Anonymous RFQs</h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <h2 className="font-display text-xl font-semibold">4. Anonymous RFQs</h2>
+            <p className="text-ink/60 leading-relaxed">
               A core feature of REVWA is anonymous request distribution. When we send an
               RFQ to vendors, we do not share your company name, contact details, or other
               identifying information unless and until you choose to proceed with a
@@ -84,11 +84,11 @@ export default function PrivacyPolicy() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-heading text-xl font-semibold">5. Sharing of Information</h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <h2 className="font-display text-xl font-semibold">5. Sharing of Information</h2>
+            <p className="text-ink/60 leading-relaxed">
               We do not sell your personal information. We may share information only with:
             </p>
-            <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-1">
+            <ul className="list-disc list-inside text-ink/60 space-y-2 ml-1">
               <li>
                 <strong className="text-foreground">Vendors</strong> you select or agree to
                 be introduced to after shortlisting
@@ -106,8 +106,8 @@ export default function PrivacyPolicy() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-heading text-xl font-semibold">6. Data Storage & Security</h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <h2 className="font-display text-xl font-semibold">6. Data Storage & Security</h2>
+            <p className="text-ink/60 leading-relaxed">
               We store data using reputable cloud providers and apply reasonable technical
               and organizational measures (encryption in transit, access controls, and
               monitoring). No method of transmission or storage is 100% secure, but we
@@ -116,8 +116,8 @@ export default function PrivacyPolicy() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-heading text-xl font-semibold">7. Data Retention</h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <h2 className="font-display text-xl font-semibold">7. Data Retention</h2>
+            <p className="text-ink/60 leading-relaxed">
               We retain account and project data for as long as needed to provide the
               service, fulfill contracts, resolve disputes, and meet legal requirements.
               You may request deletion of your account subject to legal and operational
@@ -126,25 +126,25 @@ export default function PrivacyPolicy() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-heading text-xl font-semibold">8. Your Rights</h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <h2 className="font-display text-xl font-semibold">8. Your Rights</h2>
+            <p className="text-ink/60 leading-relaxed">
               Depending on your location, you may have the right to:
             </p>
-            <ul className="list-disc list-inside text-muted-foreground space-y-2 ml-1">
+            <ul className="list-disc list-inside text-ink/60 space-y-2 ml-1">
               <li>Access the personal data we hold about you</li>
               <li>Correct inaccurate data</li>
               <li>Request deletion</li>
               <li>Object to or restrict certain processing</li>
               <li>Export your data in a portable format</li>
             </ul>
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-ink/60 leading-relaxed">
               To exercise these rights, contact us at the email below.
             </p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-heading text-xl font-semibold">9. Cookies & Analytics</h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <h2 className="font-display text-xl font-semibold">9. Cookies & Analytics</h2>
+            <p className="text-ink/60 leading-relaxed">
               We may use cookies and similar technologies for essential site functions,
               preference settings, and aggregated analytics. You can control cookies
               through your browser settings. Disabling some cookies may affect platform
@@ -153,8 +153,8 @@ export default function PrivacyPolicy() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-heading text-xl font-semibold">10. Third-Party Links</h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <h2 className="font-display text-xl font-semibold">10. Third-Party Links</h2>
+            <p className="text-ink/60 leading-relaxed">
               Our platform may contain links to third-party sites or services. We are not
               responsible for their privacy practices. We encourage you to review their
               policies separately.
@@ -162,16 +162,16 @@ export default function PrivacyPolicy() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-heading text-xl font-semibold">11. Children’s Privacy</h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <h2 className="font-display text-xl font-semibold">11. Children’s Privacy</h2>
+            <p className="text-ink/60 leading-relaxed">
               REVWA is a B2B service intended for business users. We do not knowingly
               collect personal information from children under 16.
             </p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-heading text-xl font-semibold">12. Changes to This Policy</h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <h2 className="font-display text-xl font-semibold">12. Changes to This Policy</h2>
+            <p className="text-ink/60 leading-relaxed">
               We may update this Privacy Policy from time to time. The “Last updated” date
               at the top will change when we do. Continued use of the platform after
               updates means you accept the revised policy.
@@ -179,8 +179,8 @@ export default function PrivacyPolicy() {
           </section>
 
           <section className="space-y-3">
-            <h2 className="font-heading text-xl font-semibold">13. Contact Us</h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <h2 className="font-display text-xl font-semibold">13. Contact Us</h2>
+            <p className="text-ink/60 leading-relaxed">
               If you have questions about this Privacy Policy or your data, contact us at:
             </p>
             <p className="text-foreground font-medium">
@@ -195,7 +195,7 @@ export default function PrivacyPolicy() {
           </section>
         </div>
 
-        <div className="mt-12 pt-8 border-t flex flex-wrap gap-4 text-sm text-muted-foreground">
+        <div className="mt-12 pt-8 border-t flex flex-wrap gap-4 text-sm text-ink/60">
           <Link to="/" className="hover:text-foreground transition-colors">
             ← Back to home
           </Link>
@@ -205,8 +205,8 @@ export default function PrivacyPolicy() {
         </div>
       </main>
 
-      <footer className="border-t py-8 text-center text-sm text-muted-foreground">
-        <div className="container mx-auto px-4">
+      <footer className="border-t py-8 text-center text-sm text-ink/60">
+        <div className="mx-auto max-w-[1440px] px-6 md:px-10">
           © {new Date().getFullYear()} REVWA — Independent B2B Tech Procurement Desk
         </div>
       </footer>

@@ -86,9 +86,9 @@ export default function RequestDetails() {
   }, [id, user, authLoading])
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-paper font-body text-ink">
       <Navbar />
-      <main className="flex-1 container mx-auto px-4 py-10 max-w-3xl">
+      <main className="flex-1 mx-auto max-w-[1440px] px-6 md:px-10 py-10 max-w-3xl">
         <Button asChild variant="ghost" size="sm" className="mb-6">
           <Link to="/buyer">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -98,11 +98,11 @@ export default function RequestDetails() {
 
         {loading || authLoading ? (
           <div className="flex justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <Loader2 className="h-8 w-8 animate-spin text-pop" />
           </div>
         ) : error || !req ? (
           <Card>
-            <CardContent className="py-10 text-center text-muted-foreground">
+            <CardContent className="py-10 text-center text-ink/60">
               {error || "Request not found."}
             </CardContent>
           </Card>
@@ -110,12 +110,12 @@ export default function RequestDetails() {
           <div className="space-y-6">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h1 className="font-heading text-2xl md:text-3xl font-bold">
+                <h1 className="font-display text-2xl md:text-3xl font-bold">
                   {req.title?.trim() ||
                     req.description_text?.trim()?.slice(0, 80) ||
                     "Request"}
                 </h1>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-sm text-ink/60 mt-1">
                   {req.submitted_at || req.created_at
                     ? new Date(req.submitted_at || req.created_at).toLocaleString()
                     : ""}
@@ -157,15 +157,15 @@ export default function RequestDetails() {
               </CardHeader>
               <CardContent className="grid sm:grid-cols-2 gap-3 text-sm">
                 <div>
-                  <p className="text-muted-foreground text-xs">Contact email</p>
+                  <p className="text-ink/60 text-xs">Contact email</p>
                   <p>{req.contact_email || "—"}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs">Timeline</p>
+                  <p className="text-ink/60 text-xs">Timeline</p>
                   <p>{req.timeline || "—"}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs">Budget</p>
+                  <p className="text-ink/60 text-xs">Budget</p>
                   <p>
                     {req.budget_min != null || req.budget_max != null
                       ? `${req.currency || "USD"} ${req.budget_min ?? "?"} – ${req.budget_max ?? "?"}`
@@ -173,7 +173,7 @@ export default function RequestDetails() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs">Voice note</p>
+                  <p className="text-ink/60 text-xs">Voice note</p>
                   <p>{req.voice_recording_url ? "Uploaded" : "None"}</p>
                 </div>
               </CardContent>

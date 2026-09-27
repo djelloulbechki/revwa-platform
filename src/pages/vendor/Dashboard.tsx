@@ -12,12 +12,12 @@ const mockOpportunities = [
 
 export default function VendorDashboard() {
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-paper font-body text-ink">
       <Navbar />
-      <main className="flex-1 container mx-auto px-4 py-10">
+      <main className="flex-1 mx-auto max-w-[1440px] px-6 md:px-10 py-10">
         <div className="mb-8">
-          <h1 className="font-heading text-3xl font-bold">Vendor Portal</h1>
-          <p className="text-muted-foreground mt-1">Qualified opportunities only. No public directory.</p>
+          <h1 className="font-display text-3xl font-bold">Vendor Portal</h1>
+          <p className="text-ink/60 mt-1">Qualified opportunities only. No public directory.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
@@ -34,7 +34,7 @@ export default function VendorDashboard() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{stat.value}</p>
-                  <p className="text-xs text-muted-foreground">{stat.label}</p>
+                  <p className="text-xs text-ink/60">{stat.label}</p>
                 </div>
               </CardContent>
             </Card>
@@ -51,11 +51,11 @@ export default function VendorDashboard() {
               <div key={opp.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border bg-card hover:bg-muted/30 transition-colors">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-mono text-xs text-muted-foreground">{opp.id}</span>
+                    <span className="font-mono text-xs text-ink/60">{opp.id}</span>
                     {opp.status === "new" && <Badge variant="success">New</Badge>}
                   </div>
                   <h3 className="font-semibold">{opp.title}</h3>
-                  <p className="text-sm text-muted-foreground mt-0.5">
+                  <p className="text-sm text-ink/60 mt-0.5">
                     Budget: {opp.budget} · Deadline: {opp.deadline}
                   </p>
                 </div>

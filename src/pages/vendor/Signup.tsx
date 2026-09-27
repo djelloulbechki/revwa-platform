@@ -188,15 +188,15 @@ export default function VendorSignup() {
   if (!invite) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="h-8 w-8 animate-spin text-pop" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-paper font-body text-ink">
       <Navbar />
-      <main className="flex-1 container mx-auto px-4 py-10 max-w-lg">
+      <main className="flex-1 mx-auto max-w-[1440px] px-6 md:px-10 py-10 max-w-lg">
         <Button asChild variant="ghost" size="sm" className="mb-4">
           <Link to="/vendor/join">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -206,13 +206,13 @@ export default function VendorSignup() {
 
         <Card>
           <CardHeader>
-            <div className="flex items-center gap-2 text-primary mb-1">
+            <div className="flex items-center gap-2 text-pop mb-1">
               <Building2 className="h-5 w-5" />
               <span className="text-xs font-semibold uppercase tracking-wide">
                 Partner signup
               </span>
             </div>
-            <CardTitle className="font-heading text-2xl">Create vendor account</CardTitle>
+            <CardTitle className="font-display text-2xl">Create vendor account</CardTitle>
             <CardDescription>
               Invitation verified. Companies only — complete your firm details, then
               choose how to sign in.
@@ -220,7 +220,7 @@ export default function VendorSignup() {
           </CardHeader>
           <CardContent className="space-y-5">
             {error && (
-              <div className="rounded-lg border border-destructive/30 bg-destructive/10 text-destructive text-sm p-3">
+              <div className="rounded-2xl border-2 border-destructive/30 bg-destructive/10 text-destructive text-sm p-3">
                 {error}
               </div>
             )}
@@ -240,7 +240,7 @@ export default function VendorSignup() {
               <Label htmlFor="country">Country *</Label>
               <select
                 id="country"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                className="flex h-10 w-full rounded-md border border-input bg-paper px-3 text-sm"
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
               >
@@ -311,7 +311,7 @@ export default function VendorSignup() {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">or email</span>
+                <span className="bg-card px-2 text-ink/60">or email</span>
               </div>
             </div>
 
