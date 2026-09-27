@@ -97,7 +97,17 @@ export default function VendorSignup() {
       organization_id: org.id,
       specialties: specs,
       vendor_tier: "simple",
+      onboarding_status: "under_review",
+      contact_email: email.trim() || null,
     })
+
+    // Redeem invitation code
+    if (invite?.code) {
+      await supabase.rpc("redeem_vendor_invite", {
+        p_code: invite.code,
+        p_user_id: userId,
+      })
+    }
 
     await supabase.from("profiles").upsert(
       {
@@ -147,6 +157,7 @@ export default function VendorSignup() {
 
       await createVendorOrg(userId)
       sessionStorage.removeItem("revwa_vendor_invite")
+      sessionStorage.removeItem("revwa_vendor_pending_org")
       navigate("/vendor")
     } catch (err: any) {
       setError(err.message || "Signup failed")

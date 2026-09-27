@@ -12,7 +12,9 @@ export default function VendorOnboardingComplete() {
     let cancelled = false
 
     const run = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
       if (!user) {
         navigate("/vendor/login", { replace: true })
         return
@@ -31,9 +33,9 @@ export default function VendorOnboardingComplete() {
           website?: string
           specialties?: string
           about?: string
+          invite?: { code?: string; invite_id?: string }
         }
 
-        // Skip if already a vendor member
         const { data: existing } = await supabase
           .from("organization_members")
           .select("id")
@@ -55,6 +57,7 @@ export default function VendorOnboardingComplete() {
             country_code: pending.country,
             website: pending.website || null,
             description: pending.about || null,
+            is_active: true,
           })
           .select("id")
           .single()
@@ -77,6 +80,8 @@ export default function VendorOnboardingComplete() {
           organization_id: org.id,
           specialties: specs,
           vendor_tier: "simple",
+          onboarding_status: "under_review",
+          contact_email: user.email ?? null,
         })
 
         await supabase.from("profiles").upsert(
@@ -88,6 +93,23 @@ export default function VendorOnboardingComplete() {
           },
           { onConflict: "id" }
         )
+
+        const code =
+          pending.invite?.code ||
+          (() => {
+            try {
+              return JSON.parse(sessionStorage.getItem("revwa_vendor_invite") || "{}").code
+            } catch {
+              return null
+            }
+          })()
+
+        if (code) {
+          await supabase.rpc("redeem_vendor_invite", {
+            p_code: code,
+            p_user_id: user.id,
+          })
+        }
 
         sessionStorage.removeItem("revwa_vendor_pending_org")
         sessionStorage.removeItem("revwa_vendor_invite")
@@ -105,7 +127,7 @@ export default function VendorOnboardingComplete() {
   }, [navigate])
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-3">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-paper">
       <Loader2 className="h-8 w-8 animate-spin text-pop" />
       <p className="text-sm text-ink/60">{msg}</p>
     </div>

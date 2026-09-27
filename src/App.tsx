@@ -12,6 +12,7 @@ import VendorSignup from "./pages/vendor/Signup"
 import VendorLogin from "./pages/vendor/Login"
 import VendorOnboardingComplete from "./pages/vendor/OnboardingComplete"
 import AdminScoping from "./pages/admin/Scoping"
+import AdminVendors from "./pages/admin/Vendors"
 import TermsOfService from "./pages/TermsOfService"
 import PrivacyPolicy from "./pages/PrivacyPolicy"
 
@@ -43,6 +44,7 @@ function App() {
         {/* Admin */}
         <Route path="/admin" element={<AdminScoping />} />
         <Route path="/admin/scoping" element={<AdminScoping />} />
+        <Route path="/admin/vendors" element={<AdminVendors />} />
       </Routes>
     </BrowserRouter>
   )
