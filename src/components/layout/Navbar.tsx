@@ -39,6 +39,12 @@ export function Navbar() {
           {navLink("/request", "Get Started")}
           {navLink("/quote-audit", "Quote Audit")}
           <a
+            href="#services"
+            className="text-sm font-bold text-ink/70 transition-colors hover:text-pop"
+          >
+            Services
+          </a>
+          <a
             href="#how-it-works"
             className="text-sm font-bold text-ink/70 transition-colors hover:text-pop"
           >
@@ -85,6 +91,13 @@ export function Navbar() {
             {navLink("/", "Home")}
             {navLink("/request", "Get Started")}
             {navLink("/quote-audit", "Quote Audit")}
+            <a
+              href="#services"
+              onClick={() => setOpen(false)}
+              className="text-sm font-bold text-ink/70"
+            >
+              Services
+            </a>
             <a
               href="#how-it-works"
               onClick={() => setOpen(false)}

@@ -1,94 +1,56 @@
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Shield, FileSearch, Scale } from "lucide-react"
+import { ArrowRight, Sparkles, Users, Building2 } from "lucide-react"
 
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
-      <div className="mx-auto max-w-[1440px] px-6 py-16 md:px-10 md:py-24">
-        <div className="flex flex-col items-start gap-12 lg:flex-row lg:items-center lg:gap-16">
-          <div className="w-full lg:w-1/2">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border-2 border-ink/10 bg-card px-4 py-1.5 text-sm font-medium text-ink/70">
-              <span className="size-2 rounded-full bg-pop shadow-[0_0_8px_hsl(var(--primary-glow)/0.8)]" />
-              Independent B2B Tech Matching
-            </div>
+      {/* soft ambient orbs */}
+      <div className="pointer-events-none absolute -left-24 top-10 size-72 rounded-full bg-pop/15 blur-3xl" />
+      <div className="pointer-events-none absolute -right-16 top-40 size-64 rounded-full bg-sun/20 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-0 left-1/3 size-48 rounded-full bg-mint/15 blur-3xl" />
 
-            <h1 className="font-display text-[clamp(2.4rem,6vw,4.5rem)] uppercase leading-[0.95] tracking-tight text-ink">
-              Fair tech deals.{" "}
-              <span className="text-gradient">Clear scope.</span>{" "}
-              No surprises.
-            </h1>
-
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink/70">
-              REVWA connects companies with the right cloud, automation, and AI
-              vendors — with precise scopes, anonymous RFQs, and real competition.
-            </p>
-
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Button asChild size="xl">
-                <Link to="/request">
-                  Start Free Request
-                  <ArrowRight className="ml-1 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="xl">
-                <Link to="/quote-audit">
-                  <FileSearch className="mr-1 h-5 w-5" />
-                  Audit Existing Quote
-                </Link>
-              </Button>
-            </div>
-
-            <div className="mt-8 flex items-center gap-3">
-              <div className="flex -space-x-2">
-                <span className="size-8 rounded-full border-2 border-paper bg-pop shadow-[0_0_10px_hsl(var(--primary-glow)/0.5)]" />
-                <span className="size-8 rounded-full border-2 border-paper bg-sun" />
-                <span className="size-8 rounded-full border-2 border-paper bg-mint" />
-              </div>
-              <p className="text-sm font-medium text-ink/60">
-                First deal free for buyers
-              </p>
-            </div>
+      <div className="relative mx-auto max-w-[1440px] px-6 py-16 md:px-10 md:py-24">
+        <div className="mx-auto max-w-4xl text-center">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border-2 border-ink/10 bg-card px-4 py-1.5 text-sm font-bold text-ink/70 shadow-sm">
+            <Sparkles className="h-4 w-4 text-pop" />
+            For freelancers, startups & growing companies
           </div>
 
-          {/* Feature cards — each a different bold color */}
-          <div className="grid w-full gap-4 sm:grid-cols-3 lg:w-1/2 lg:grid-cols-1 xl:grid-cols-3">
-            {[
-              {
-                icon: Scale,
-                title: "Fair Pricing",
-                desc: "Anonymous RFQs force real competition",
-                bg: "bg-sun text-white",
-                body: "text-white/90",
-              },
-              {
-                icon: FileSearch,
-                title: "Clear Scope",
-                desc: "Professional tech requirements documents",
-                bg: "bg-sky text-white",
-                body: "text-white/90",
-              },
-              {
-                icon: Shield,
-                title: "Zero Commitment",
-                desc: "First deal completely free for buyers",
-                bg: "bg-pop text-white",
-                body: "text-white/90",
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className={`rounded-3xl p-6 shadow-[0_8px_0_0_rgba(0,0,0,0.12)] ${item.bg}`}
-              >
-                <item.icon className="mb-3 h-8 w-8 opacity-95" />
-                <h3 className="font-display text-lg uppercase tracking-wide">
-                  {item.title}
-                </h3>
-                <p className={`mt-1 text-sm leading-relaxed ${item.body}`}>
-                  {item.desc}
-                </p>
-              </div>
-            ))}
+          <h1 className="font-display text-[clamp(2.5rem,7vw,4.75rem)] uppercase leading-[0.92] tracking-tight text-ink">
+            All the tech you need.{" "}
+            <span className="text-gradient">Matched fairly.</span>
+          </h1>
+
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-ink/70 md:text-xl">
+            Social automation, sales workflows, AI, websites, and apps —
+            one place to request what you need and get matched with the right
+            specialists. Clear scope. Fair quotes. No jargon.
+          </p>
+
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <Button asChild size="xl">
+              <Link to="/request">
+                Start free request
+                <ArrowRight className="ml-1 h-5 w-5" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="xl">
+              <a href="#services">See services</a>
+            </Button>
+          </div>
+
+          {/* audience chips — design says "for everyone" */}
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-3">
+            <span className="inline-flex items-center gap-2 rounded-full bg-sun px-4 py-2 text-sm font-bold text-white shadow-[0_4px_0_0_rgba(0,0,0,0.12)]">
+              <Users className="h-4 w-4" /> Individuals
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-full bg-sky px-4 py-2 text-sm font-bold text-white shadow-[0_4px_0_0_rgba(0,0,0,0.12)]">
+              <Building2 className="h-4 w-4" /> Companies
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-full bg-pop px-4 py-2 text-sm font-bold text-white shadow-[0_4px_0_0_rgba(0,0,0,0.12)]">
+              <Sparkles className="h-4 w-4" /> First match free
+            </span>
           </div>
         </div>
       </div>
