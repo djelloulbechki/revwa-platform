@@ -1,47 +1,57 @@
 import { EyeOff, FileCheck2, HeartHandshake, Zap } from "lucide-react"
+import { useLanguage } from "@/i18n/LanguageContext"
+import type { TranslationKey } from "@/i18n/translations"
 
-const reasons = [
+const reasons: {
+  icon: typeof Zap
+  title: TranslationKey
+  desc: TranslationKey
+  color: string
+  bg: string
+}[] = [
   {
     icon: FileCheck2,
-    title: "Clear scope first",
-    desc: "Everyone quotes the same brief — fewer surprises later.",
+    title: "why_1_title",
+    desc: "why_1_desc",
     color: "text-sun",
     bg: "bg-sun/10",
   },
   {
     icon: EyeOff,
-    title: "Fair matching",
-    desc: "Anonymous where it matters so offers compete on value.",
+    title: "why_2_title",
+    desc: "why_2_desc",
     color: "text-pop",
     bg: "bg-pop/10",
   },
   {
     icon: HeartHandshake,
-    title: "Human + platform",
-    desc: "Not a cold marketplace — guidance when you need it.",
+    title: "why_3_title",
+    desc: "why_3_desc",
     color: "text-mint",
     bg: "bg-mint/10",
   },
   {
     icon: Zap,
-    title: "Start simple",
-    desc: "First request is free for buyers. Cancel nothing.",
+    title: "why_4_title",
+    desc: "why_4_desc",
     color: "text-vio",
     bg: "bg-vio/10",
   },
 ]
 
 export function WhyRevwa() {
+  const { t } = useLanguage()
+
   return (
     <section className="border-t-2 border-ink/10">
       <div className="mx-auto max-w-[1440px] px-6 py-16 md:px-10 md:py-24">
         <div className="mb-12 max-w-2xl">
           <p className="mb-3 text-sm font-bold uppercase tracking-widest text-pop">
-            Why REVWA
+            {t("why_eyebrow")}
           </p>
-          <h2 className="font-display text-[clamp(1.9rem,4.5vw,3.25rem)] uppercase leading-[0.95] text-ink">
-            Designed to feel{" "}
-            <span className="text-gradient">open, not exclusive</span>
+          <h2 className="font-display text-[clamp(1.9rem,4.5vw,3.25rem)] leading-[0.95] text-ink md:uppercase">
+            {t("why_title_1")}{" "}
+            <span className="text-gradient">{t("why_title_2")}</span>
           </h2>
         </div>
 
@@ -56,8 +66,8 @@ export function WhyRevwa() {
               >
                 <r.icon className="h-6 w-6" />
               </div>
-              <h3 className="font-display text-lg uppercase">{r.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-ink/65">{r.desc}</p>
+              <h3 className="font-display text-lg md:uppercase">{t(r.title)}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink/65">{t(r.desc)}</p>
             </div>
           ))}
         </div>

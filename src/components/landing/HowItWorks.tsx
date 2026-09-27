@@ -1,31 +1,16 @@
-const steps = [
-  {
-    n: "01",
-    title: "Tell us what you need",
-    desc: "Social, sales, AI, website, or app — describe it in plain language. No technical jargon required.",
-    className: "bg-sun text-white",
-  },
-  {
-    n: "02",
-    title: "We shape a clear scope",
-    desc: "Your idea becomes a precise brief so vendors quote the same work — not guesswork.",
-    className: "bg-sky text-white",
-  },
-  {
-    n: "03",
-    title: "Matched specialists",
-    desc: "We connect you with qualified partners for that service lane — fairly and transparently.",
-    className: "bg-pop text-white",
-  },
-  {
-    n: "04",
-    title: "You choose the best fit",
-    desc: "Compare offers side by side. Pick the partner that feels right for you or your company.",
-    className: "bg-mint text-white",
-  },
+import { useLanguage } from "@/i18n/LanguageContext"
+import type { TranslationKey } from "@/i18n/translations"
+
+const steps: { n: string; title: TranslationKey; desc: TranslationKey; className: string }[] = [
+  { n: "01", title: "how_1_title", desc: "how_1_desc", className: "bg-sun text-white" },
+  { n: "02", title: "how_2_title", desc: "how_2_desc", className: "bg-sky text-white" },
+  { n: "03", title: "how_3_title", desc: "how_3_desc", className: "bg-pop text-white" },
+  { n: "04", title: "how_4_title", desc: "how_4_desc", className: "bg-mint text-white" },
 ]
 
 export function HowItWorks() {
+  const { t } = useLanguage()
+
   return (
     <section
       id="how-it-works"
@@ -33,11 +18,11 @@ export function HowItWorks() {
     >
       <div className="mb-12 max-w-2xl">
         <p className="mb-3 text-sm font-bold uppercase tracking-widest text-pop">
-          How it works
+          {t("how_eyebrow")}
         </p>
-        <h2 className="font-display text-[clamp(1.9rem,4.5vw,3.25rem)] uppercase leading-[0.95] text-ink">
-          From idea to matched partner{" "}
-          <span className="text-pop">in four steps</span>
+        <h2 className="font-display text-[clamp(1.9rem,4.5vw,3.25rem)] leading-[0.95] text-ink md:uppercase">
+          {t("how_title_1")}{" "}
+          <span className="text-pop">{t("how_title_2")}</span>
         </h2>
       </div>
 
@@ -49,10 +34,10 @@ export function HowItWorks() {
           >
             <div className="pointer-events-none absolute -right-6 -top-6 size-24 rounded-full bg-white/10" />
             <span className="font-display text-5xl opacity-35">{s.n}</span>
-            <h3 className="mb-2 mt-3 font-display text-xl uppercase tracking-wide">
-              {s.title}
+            <h3 className="mb-2 mt-3 font-display text-xl leading-tight md:uppercase">
+              {t(s.title)}
             </h3>
-            <p className="leading-relaxed text-white/90">{s.desc}</p>
+            <p className="leading-relaxed text-white/90">{t(s.desc)}</p>
           </div>
         ))}
       </div>

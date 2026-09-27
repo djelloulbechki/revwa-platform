@@ -6,8 +6,11 @@ import { HowItWorks } from "@/components/landing/HowItWorks"
 import { WhyRevwa } from "@/components/landing/WhyRevwa"
 import { CTA } from "@/components/landing/CTA"
 import { Link } from "react-router-dom"
+import { useLanguage } from "@/i18n/LanguageContext"
 
 export default function Index() {
+  const { t } = useLanguage()
+
   return (
     <div className="flex min-h-screen flex-col bg-paper font-body text-ink">
       <Navbar />
@@ -23,12 +26,14 @@ export default function Index() {
         <span className="font-display uppercase text-ink">REVWA</span>
         <div className="flex flex-wrap items-center justify-center gap-4">
           <Link to="/terms" className="hover:text-pop">
-            Terms
+            {t("footer_terms")}
           </Link>
           <Link to="/privacy" className="hover:text-pop">
-            Privacy
+            {t("footer_privacy")}
           </Link>
-          <span>© {new Date().getFullYear()} — Tech matched fairly</span>
+          <span>
+            © {new Date().getFullYear()} — {t("footer_tag")}
+          </span>
         </div>
       </footer>
     </div>

@@ -178,3 +178,20 @@
       0 0 6px hsl(var(--primary-glow) / 0.3) inset;
   }
 }
+
+
+/* Arabic typography */
+html.lang-ar body {
+  font-family: "Cairo", "Space Grotesk", system-ui, sans-serif;
+}
+html.lang-ar h1,
+html.lang-ar h2,
+html.lang-ar h3,
+html.lang-ar h4,
+html.lang-ar h5,
+html.lang-ar h6,
+html.lang-ar .font-display {
+  font-family: "Cairo", "Archivo Black", system-ui, sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+}
