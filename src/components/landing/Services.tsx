@@ -1,138 +1,160 @@
-import {
-  Share2,
-  TrendingUp,
-  Bot,
-  Globe,
-  Smartphone,
-  type LucideIcon,
-} from "lucide-react"
+import workflowImg from "@/assets/services/workflow-automation.png"
+import salesImg from "@/assets/services/sales-growth.jpg"
+import aiImg from "@/assets/services/ai-solutions.jpg"
+import businessImg from "@/assets/services/business-systems.jpg"
+import cloudImg from "@/assets/services/cloud-infra.jpg"
+import connectImg from "@/assets/services/connect-services.png"
 
-type Service = {
-  icon: LucideIcon
+type ServiceBlock = {
+  id: string
+  eyebrow: string
   title: string
-  subtitle: string
+  desc: string
   points: string[]
-  shell: string
+  img: string
+  reverse?: boolean
+  accent: string
   badge: string
 }
 
-const services: Service[] = [
+const blocks: ServiceBlock[] = [
   {
-    icon: Share2,
+    id: "social",
+    eyebrow: "01 · Social & workflows",
     title: "Social media automation",
-    subtitle: "Post, engage, and grow without living in the apps",
-    points: ["Content scheduling", "Inbox & replies", "Analytics loops"],
-    shell: "bg-sun text-white",
-    badge: "01",
+    desc: "Connect Instagram, WhatsApp, TikTok, LinkedIn and more into one smooth flow — so posting and replies stop eating your day.",
+    points: ["Cross-platform workflows", "Fewer manual steps", "Built for creators & teams"],
+    img: workflowImg,
+    accent: "from-sun to-rose-500",
+    badge: "bg-sun",
   },
   {
-    icon: TrendingUp,
-    title: "Sales automation",
-    subtitle: "From lead to close — fewer manual steps",
-    points: ["CRM workflows", "Follow-ups", "Pipeline alerts"],
-    shell: "bg-sky text-white",
-    badge: "02",
+    id: "sales",
+    eyebrow: "02 · Growth",
+    title: "Sales & marketing automation",
+    desc: "Lead gen, SEO, support, and sales growth — structured so the right partner can execute without vague briefs.",
+    points: ["Sales pipelines", "Lead gen & marketing", "Support & SEO"],
+    img: salesImg,
+    reverse: true,
+    accent: "from-sky to-pop",
+    badge: "bg-sky",
   },
   {
-    icon: Bot,
-    title: "Artificial intelligence",
-    subtitle: "AI assistants and smart tools that actually help",
-    points: ["Chat & support bots", "Document AI", "Custom agents"],
-    shell: "bg-pop text-white",
-    badge: "03",
+    id: "ai",
+    eyebrow: "03 · Intelligence",
+    title: "AI solutions",
+    desc: "Chatbots, voice AI, document AI, and analytics — matched to specialists who ship usable systems, not demos.",
+    points: ["AI chatbots", "Voice & document AI", "Analytics that help"],
+    img: aiImg,
+    accent: "from-pop to-vio",
+    badge: "bg-pop",
   },
   {
-    icon: Globe,
-    title: "Website building",
-    subtitle: "Fast, clear sites that convert visitors",
-    points: ["Landing pages", "Business sites", "E-commerce ready"],
-    shell: "bg-mint text-white",
-    badge: "04",
+    id: "systems",
+    eyebrow: "04 · Operations",
+    title: "Business systems",
+    desc: "ERP, CRM, HR, finance, inventory, booking — the systems that run the company, scoped clearly before anyone quotes.",
+    points: ["CRM & finance", "HR & inventory", "Booking & helpdesk"],
+    img: businessImg,
+    reverse: true,
+    accent: "from-mint to-pop",
+    badge: "bg-mint",
   },
   {
-    icon: Smartphone,
-    title: "App building",
-    subtitle: "Mobile & web apps shaped around your users",
-    points: ["MVP to scale", "iOS & Android", "Web apps"],
-    shell: "bg-vio text-white",
-    badge: "05",
+    id: "cloud",
+    eyebrow: "05 · Infrastructure",
+    title: "Cloud & infrastructure",
+    desc: "Servers, DevOps, databases, backup — reliable foundations when you need more than a landing page.",
+    points: ["Cloud & servers", "DevOps & databases", "Backup & security"],
+    img: cloudImg,
+    accent: "from-sky to-sun",
+    badge: "bg-sky",
+  },
+  {
+    id: "connect",
+    eyebrow: "06 · Integrations",
+    title: "APIs & connected services",
+    desc: "Payments, webhooks, platforms — wire your tools together so data flows without spreadsheet chaos.",
+    points: ["API hubs", "Payment gateways", "Webhook data flow"],
+    img: connectImg,
+    reverse: true,
+    accent: "from-pop to-mint",
+    badge: "bg-pop",
   },
 ]
 
 export function Services() {
   return (
     <section id="services" className="relative border-t-2 border-ink/10">
-      <div className="mx-auto max-w-[1440px] px-6 py-16 md:px-10 md:py-24">
-        <div className="mb-12 max-w-2xl">
+      <div className="mx-auto max-w-[1440px] px-6 py-16 md:px-10 md:py-20">
+        <div className="mb-14 max-w-2xl">
           <p className="mb-3 text-sm font-bold uppercase tracking-widest text-pop">
-            What you can request
+            Services you can request
           </p>
           <h2 className="font-display text-[clamp(1.9rem,4.5vw,3.25rem)] uppercase leading-[0.95] text-ink">
-            Five service lanes.{" "}
-            <span className="text-sun">One fair match.</span>
+            See it. Understand it.{" "}
+            <span className="text-sun">Request it.</span>
           </h2>
           <p className="mt-4 text-lg text-ink/70">
-            Pick what you need — we turn it into a clear scope and connect you
-            with specialists. Designed so anyone can understand the offer at a glance.
+            From social automation to cloud — each lane is visual on purpose, so anyone
+            (solo or company) knows what REVWA can match for them.
           </p>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {services.map((s) => (
+        <div className="space-y-16 md:space-y-24">
+          {blocks.map((b) => (
             <article
-              key={s.title}
-              className={`group relative overflow-hidden rounded-3xl p-7 shadow-[0_10px_0_0_rgba(0,0,0,0.12)] transition-transform hover:-translate-y-1 ${s.shell}`}
+              key={b.id}
+              id={b.id}
+              className={`grid items-center gap-8 lg:grid-cols-2 lg:gap-14 ${
+                b.reverse ? "lg:[&>*:first-child]:order-2" : ""
+              }`}
             >
-              {/* decorative circle */}
-              <div className="pointer-events-none absolute -right-8 -top-8 size-36 rounded-full bg-white/10" />
-              <div className="pointer-events-none absolute -bottom-10 -left-6 size-28 rounded-full bg-black/10" />
-
+              {/* Visual */}
               <div className="relative">
-                <div className="mb-5 flex items-start justify-between">
-                  <div className="flex size-14 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
-                    <s.icon className="h-7 w-7" strokeWidth={2.25} />
-                  </div>
-                  <span className="font-display text-3xl opacity-40">{s.badge}</span>
+                <div
+                  className={`absolute -inset-3 rounded-[2rem] bg-gradient-to-br ${b.accent} opacity-30 blur-2xl`}
+                />
+                <div className="relative overflow-hidden rounded-3xl border-2 border-ink/10 bg-ink shadow-[0_16px_0_0_rgba(0,0,0,0.12)]">
+                  <img
+                    src={b.img}
+                    alt={b.title}
+                    className="h-auto w-full object-cover"
+                    loading="lazy"
+                  />
                 </div>
-                <h3 className="font-display text-xl uppercase leading-tight tracking-wide">
-                  {s.title}
+              </div>
+
+              {/* Copy */}
+              <div>
+                <span
+                  className={`mb-4 inline-block rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide text-white ${b.badge}`}
+                >
+                  {b.eyebrow}
+                </span>
+                <h3 className="font-display text-[clamp(1.6rem,3vw,2.4rem)] uppercase leading-tight text-ink">
+                  {b.title}
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/90">
-                  {s.subtitle}
+                <p className="mt-4 text-base leading-relaxed text-ink/70 md:text-lg">
+                  {b.desc}
                 </p>
-                <ul className="mt-5 space-y-2">
-                  {s.points.map((p) => (
-                    <li
-                      key={p}
-                      className="flex items-center gap-2 text-sm font-medium text-white/95"
-                    >
-                      <span className="size-1.5 shrink-0 rounded-full bg-white" />
+                <ul className="mt-6 space-y-3">
+                  {b.points.map((p) => (
+                    <li key={p} className="flex items-center gap-3 font-medium text-ink">
+                      <span className={`size-2.5 rounded-full ${b.badge}`} />
                       {p}
                     </li>
                   ))}
                 </ul>
+                <a
+                  href="/request"
+                  className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-pop underline decoration-2 underline-offset-4 hover:text-sky"
+                >
+                  Request this service →
+                </a>
               </div>
             </article>
           ))}
-
-          {/* CTA tile in the grid */}
-          <article className="flex flex-col justify-between rounded-3xl border-2 border-dashed border-ink/20 bg-card p-7 shadow-[0_10px_0_0_rgba(0,0,0,0.06)] sm:col-span-2 lg:col-span-1">
-            <div>
-              <p className="font-display text-lg uppercase text-ink">
-                Need something else?
-              </p>
-              <p className="mt-2 text-sm text-ink/60">
-                Cloud, servers, custom automation — tell us in plain language.
-                We still match you fairly.
-              </p>
-            </div>
-            <a
-              href="/request"
-              className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-pop underline decoration-2 underline-offset-4"
-            >
-              Describe your project →
-            </a>
-          </article>
         </div>
       </div>
     </section>
