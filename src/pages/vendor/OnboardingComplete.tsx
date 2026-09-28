@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { supabase } from "@/lib/supabase"
 import { Loader2 } from "lucide-react"
 
-/** After OAuth redirect: create org from sessionStorage pending payload */
+/** Complete invited vendor onboarding after OAuth or email confirmation. */
 export default function VendorOnboardingComplete() {
   const navigate = useNavigate()
   const [msg, setMsg] = useState("Finishing partner setup…")
@@ -20,21 +20,43 @@ export default function VendorOnboardingComplete() {
         return
       }
 
-      const raw = sessionStorage.getItem("revwa_vendor_pending_org")
-      if (!raw) {
-        navigate("/vendor", { replace: true })
+      const metadata = user.user_metadata || {}
+      const raw = localStorage.getItem("revwa_vendor_pending_org")
+      let pending: {
+        companyName: string
+        country: string
+        website?: string
+        specialties?: string
+        about?: string
+        invite?: { code?: string; invite_id?: string }
+      } | null = null
+
+      if (raw) {
+        try {
+          pending = JSON.parse(raw)
+        } catch {
+          pending = null
+        }
+      }
+
+      // Email confirmation can open in a new tab/browser, so localStorage
+      // is only a fallback. The authoritative pending vendor data is stored
+      // in auth user metadata during sign-up.
+      pending = pending || {
+        companyName: metadata.company_name || "",
+        country: metadata.vendor_country || "SA",
+        website: metadata.vendor_website || "",
+        specialties: metadata.vendor_specialties || "",
+        about: metadata.vendor_about || "",
+        invite: metadata.vendor_invite ? { code: metadata.vendor_invite } : undefined,
+      }
+
+      if (!pending.companyName || !pending.invite?.code) {
+        navigate("/vendor/join", { replace: true })
         return
       }
 
       try {
-        const pending = JSON.parse(raw) as {
-          companyName: string
-          country: string
-          website?: string
-          specialties?: string
-          about?: string
-          invite?: { code?: string; invite_id?: string }
-        }
 
         const specs = (pending.specialties || "")
           .split(",")
@@ -45,7 +67,7 @@ export default function VendorOnboardingComplete() {
           pending.invite?.code ||
           (() => {
             try {
-              return JSON.parse(sessionStorage.getItem("revwa_vendor_invite") || "{}").code
+              return JSON.parse(localStorage.getItem("revwa_vendor_invite") || "{}").code
             } catch {
               return null
             }
@@ -70,8 +92,8 @@ export default function VendorOnboardingComplete() {
         if (!data?.ok || !data.organization_id) {
           throw new Error("Vendor organization setup could not be completed.")
         }
-        sessionStorage.removeItem("revwa_vendor_pending_org")
-        sessionStorage.removeItem("revwa_vendor_invite")
+        localStorage.removeItem("revwa_vendor_pending_org")
+        localStorage.removeItem("revwa_vendor_invite")
         if (!cancelled) navigate("/vendor", { replace: true })
       } catch (e: any) {
         console.error(e)

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/hooks/useAuth"
 import { useLanguage } from "@/i18n/LanguageContext"
+import { supabase } from "@/lib/supabase"
 import { Loader2 } from "lucide-react"
 
 export default function Login() {
@@ -27,7 +28,32 @@ export default function Login() {
     if (error) {
       setError(error.message)
     } else {
-      navigate("/buyer")
+      // Route by the server-side profile role instead of assuming every
+      // authenticated user is a buyer.
+      const userId = (await supabase.auth.getUser()).data.user?.id
+      if (!userId) {
+        setError("Signed in, but no authenticated user was returned.")
+        return
+      }
+
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", userId)
+        .maybeSingle()
+
+      if (profileError) {
+        setError(profileError.message)
+        return
+      }
+
+      if (profile?.role === "platform_admin") {
+        navigate("/admin")
+      } else if (profile?.role === "vendor_admin") {
+        navigate("/vendor")
+      } else {
+        navigate("/buyer")
+      }
     }
   }
 

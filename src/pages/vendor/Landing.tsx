@@ -76,7 +76,7 @@ export default function VendorLanding() {
       }
 
       // Pass invite to signup via sessionStorage
-      sessionStorage.setItem(
+      localStorage.setItem(
         "revwa_vendor_invite",
         JSON.stringify({
           code: trimmed,

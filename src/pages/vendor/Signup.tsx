@@ -49,7 +49,7 @@ export default function VendorSignup() {
   const [error, setError] = useState("")
 
   useEffect(() => {
-    const raw = sessionStorage.getItem("revwa_vendor_invite")
+    const raw = localStorage.getItem("revwa_vendor_invite")
     if (!raw) {
       navigate("/vendor/join", { replace: true })
       return
@@ -110,14 +110,20 @@ export default function VendorSignup() {
             full_name: fullName.trim(),
             vendor_invite: invite?.code,
             company_name: companyName.trim(),
+            vendor_country: country,
+            vendor_website: website.trim() || null,
+            vendor_specialties: specialties.trim(),
+            vendor_about: about.trim() || null,
+            vendor_contact_email: email.trim(),
           },
+          emailRedirectTo: `${window.location.origin}/vendor/onboarding-complete`,
         },
       })
       if (signErr) throw signErr
       const userId = data.user?.id
       if (!userId) throw new Error("Signup succeeded but no user id returned.")
 
-      sessionStorage.setItem(
+      localStorage.setItem(
         "revwa_vendor_pending_org",
         JSON.stringify({
           companyName: companyName.trim(),
@@ -135,8 +141,8 @@ export default function VendorSignup() {
       }
 
       await createVendorOrg(userId)
-      sessionStorage.removeItem("revwa_vendor_invite")
-      sessionStorage.removeItem("revwa_vendor_pending_org")
+      localStorage.removeItem("revwa_vendor_invite")
+      localStorage.removeItem("revwa_vendor_pending_org")
       navigate("/vendor")
     } catch (err: any) {
       setError(err.message || "Signup failed")
@@ -151,7 +157,7 @@ export default function VendorSignup() {
       return
     }
     // Stash company form for after OAuth redirect
-    sessionStorage.setItem(
+    localStorage.setItem(
       "revwa_vendor_pending_org",
       JSON.stringify({
         companyName: companyName.trim(),

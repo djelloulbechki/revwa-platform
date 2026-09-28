@@ -31,7 +31,7 @@ export default function VendorLogin() {
         password,
       })
       if (err) throw err
-      const destination = sessionStorage.getItem("revwa_vendor_pending_org")
+      const destination = localStorage.getItem("revwa_vendor_pending_org")
         ? "/vendor/onboarding-complete"
         : "/vendor"
       navigate(destination)
@@ -48,7 +48,7 @@ export default function VendorLogin() {
       provider,
       options: {
         redirectTo: `${window.location.origin}${
-          sessionStorage.getItem("revwa_vendor_pending_org")
+          localStorage.getItem("revwa_vendor_pending_org")
             ? "/vendor/onboarding-complete"
             : "/vendor"
         }`,
