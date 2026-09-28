@@ -13,7 +13,6 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { supabase } from "@/lib/supabase"
-import { useAuth } from "@/hooks/useAuth"
 import { Loader2, Building2, ArrowLeft } from "lucide-react"
 
 const COUNTRIES = [
@@ -37,7 +36,6 @@ type InvitePayload = {
 
 export default function VendorSignup() {
   const navigate = useNavigate()
-  const { signInWithOAuth, linkIdentity } = useAuth()
   const [invite, setInvite] = useState<InvitePayload | null>(null)
   const [companyName, setCompanyName] = useState("")
   const [country, setCountry] = useState("SA")
@@ -66,64 +64,28 @@ export default function VendorSignup() {
   }, [navigate])
 
   const createVendorOrg = async (userId: string) => {
-    const { data: org, error: orgErr } = await supabase
-      .from("organizations")
-      .insert({
-        name: companyName.trim(),
-        type: "vendor",
-        country_code: country,
-        website: website.trim() || null,
-        description: about.trim() || null,
-        is_active: true,
-      })
-      .select("id")
-      .single()
-
-    if (orgErr) throw orgErr
-
-    await supabase.from("organization_members").insert({
-      organization_id: org.id,
-      user_id: userId,
-      role: "vendor_admin",
-      is_primary: true,
-    })
+    if (!invite?.code) throw new Error("A valid vendor invitation is required.")
+    if (!userId) throw new Error("No authenticated user was returned.")
 
     const specs = specialties
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean)
 
-    await supabase.from("vendor_profiles").insert({
-      organization_id: org.id,
-      specialties: specs,
-      vendor_tier: "simple",
-      onboarding_status: "under_review",
-      contact_email: email.trim() || null,
+    const { data, error } = await supabase.rpc("create_vendor_organization", {
+      p_company_name: companyName.trim(),
+      p_country_code: country,
+      p_website: website.trim() || null,
+      p_description: about.trim() || null,
+      p_specialties: specs,
+      p_contact_email: email.trim() || null,
+      p_invite_code: invite.code,
+      p_full_name: fullName.trim() || null,
     })
 
-    // Redeem invitation code
-    if (invite?.code) {
-      await supabase.rpc("redeem_vendor_invite", {
-        p_code: invite.code,
-        p_user_id: userId,
-      })
-    }
-
-    await supabase.from("profiles").upsert(
-      {
-        id: userId,
-        full_name: fullName.trim() || null,
-        email: email.trim() || null,
-        activation_status: "activated",
-        role: "vendor_admin",
-      },
-      { onConflict: "id" }
-    )
-
-    // Mark invite used (best-effort; admin RPC preferred later)
-    if (invite?.invite_id) {
-      await supabase.rpc("validate_vendor_invite", { p_code: invite.code })
-      // increment via edge function later; for now leave admin-managed
+    if (error) throw error
+    if (!data?.ok || !data.organization_id) {
+      throw new Error("Vendor organization setup could not be completed.")
     }
   }
 
@@ -154,6 +116,23 @@ export default function VendorSignup() {
       if (signErr) throw signErr
       const userId = data.user?.id
       if (!userId) throw new Error("Signup succeeded but no user id returned.")
+
+      sessionStorage.setItem(
+        "revwa_vendor_pending_org",
+        JSON.stringify({
+          companyName: companyName.trim(),
+          country,
+          website: website.trim(),
+          specialties: specialties.trim(),
+          about: about.trim(),
+          invite,
+        })
+      )
+
+      if (!data.session) {
+        setError("Account created. Please confirm your email, then sign in to finish your partner setup.")
+        return
+      }
 
       await createVendorOrg(userId)
       sessionStorage.removeItem("revwa_vendor_invite")

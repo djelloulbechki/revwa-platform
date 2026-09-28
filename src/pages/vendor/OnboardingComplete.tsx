@@ -36,63 +36,10 @@ export default function VendorOnboardingComplete() {
           invite?: { code?: string; invite_id?: string }
         }
 
-        const { data: existing } = await supabase
-          .from("organization_members")
-          .select("id")
-          .eq("user_id", user.id)
-          .limit(1)
-
-        if (existing && existing.length > 0) {
-          sessionStorage.removeItem("revwa_vendor_pending_org")
-          sessionStorage.removeItem("revwa_vendor_invite")
-          navigate("/vendor", { replace: true })
-          return
-        }
-
-        const { data: org, error: orgErr } = await supabase
-          .from("organizations")
-          .insert({
-            name: pending.companyName,
-            type: "vendor",
-            country_code: pending.country,
-            website: pending.website || null,
-            description: pending.about || null,
-            is_active: true,
-          })
-          .select("id")
-          .single()
-
-        if (orgErr) throw orgErr
-
-        await supabase.from("organization_members").insert({
-          organization_id: org.id,
-          user_id: user.id,
-          role: "vendor_admin",
-          is_primary: true,
-        })
-
         const specs = (pending.specialties || "")
           .split(",")
           .map((s) => s.trim())
           .filter(Boolean)
-
-        await supabase.from("vendor_profiles").insert({
-          organization_id: org.id,
-          specialties: specs,
-          vendor_tier: "simple",
-          onboarding_status: "under_review",
-          contact_email: user.email ?? null,
-        })
-
-        await supabase.from("profiles").upsert(
-          {
-            id: user.id,
-            email: user.email,
-            activation_status: "activated",
-            role: "vendor_admin",
-          },
-          { onConflict: "id" }
-        )
 
         const code =
           pending.invite?.code ||
@@ -104,13 +51,25 @@ export default function VendorOnboardingComplete() {
             }
           })()
 
-        if (code) {
-          await supabase.rpc("redeem_vendor_invite", {
-            p_code: code,
-            p_user_id: user.id,
-          })
+        if (!code) {
+          throw new Error("Your vendor invitation is missing. Please restart from the invitation link.")
         }
 
+        const { data, error } = await supabase.rpc("create_vendor_organization", {
+          p_company_name: pending.companyName,
+          p_country_code: pending.country,
+          p_website: pending.website || null,
+          p_description: pending.about || null,
+          p_specialties: specs,
+          p_contact_email: user.email ?? null,
+          p_invite_code: code,
+          p_full_name: user.user_metadata?.full_name || user.user_metadata?.name || null,
+        })
+
+        if (error) throw error
+        if (!data?.ok || !data.organization_id) {
+          throw new Error("Vendor organization setup could not be completed.")
+        }
         sessionStorage.removeItem("revwa_vendor_pending_org")
         sessionStorage.removeItem("revwa_vendor_invite")
         if (!cancelled) navigate("/vendor", { replace: true })

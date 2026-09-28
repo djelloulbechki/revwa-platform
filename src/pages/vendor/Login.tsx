@@ -31,7 +31,10 @@ export default function VendorLogin() {
         password,
       })
       if (err) throw err
-      navigate("/vendor")
+      const destination = sessionStorage.getItem("revwa_vendor_pending_org")
+        ? "/vendor/onboarding-complete"
+        : "/vendor"
+      navigate(destination)
     } catch (err: any) {
       setError(err.message || "Sign in failed")
     } finally {
@@ -43,7 +46,13 @@ export default function VendorLogin() {
     setLoading(true)
     const { error: err } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/vendor` },
+      options: {
+        redirectTo: `${window.location.origin}${
+          sessionStorage.getItem("revwa_vendor_pending_org")
+            ? "/vendor/onboarding-complete"
+            : "/vendor"
+        }`,
+      },
     })
     if (err) {
       setError(err.message)
