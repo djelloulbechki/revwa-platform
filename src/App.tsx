@@ -11,6 +11,8 @@ import VendorLanding from "./pages/vendor/Landing"
 import VendorSignup from "./pages/vendor/Signup"
 import VendorLogin from "./pages/vendor/Login"
 import VendorOnboardingComplete from "./pages/vendor/OnboardingComplete"
+import AdminDashboard from "./pages/admin/Dashboard"
+import AdminRequests from "./pages/admin/Requests"
 import AdminScoping from "./pages/admin/Scoping"
 import AdminVendors from "./pages/admin/Vendors"
 import TermsOfService from "./pages/TermsOfService"
@@ -42,7 +44,9 @@ function App() {
         <Route path="/vendor/*" element={<VendorDashboard />} />
 
         {/* Admin */}
-        <Route path="/admin" element={<AdminScoping />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/requests" element={<AdminRequests />} />
+        <Route path="/admin/requests/:id" element={<AdminRequests />} />
         <Route path="/admin/scoping" element={<AdminScoping />} />
         <Route path="/admin/vendors" element={<AdminVendors />} />
       </Routes>
