@@ -4,6 +4,7 @@ import Request from "./pages/Request"
 import QuoteAudit from "./pages/QuoteAudit"
 import Login from "./pages/auth/Login"
 import Signup from "./pages/auth/Signup"
+import OAuthCallback from "./pages/auth/OAuthCallback"
 import BuyerDashboard from "./pages/buyer/Dashboard"
 import RequestDetails from "./pages/buyer/RequestDetails"
 import VendorDashboard from "./pages/vendor/Dashboard"
@@ -27,6 +28,7 @@ function App() {
         <Route path="/request" element={<Request />} />
         <Route path="/quote-audit" element={<QuoteAudit />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/auth/callback" element={<OAuthCallback />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />

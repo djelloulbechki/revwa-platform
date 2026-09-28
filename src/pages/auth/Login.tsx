@@ -15,9 +15,19 @@ export default function Login() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const { signIn } = useAuth()
+  const { signIn, signInWithOAuth } = useAuth()
   const navigate = useNavigate()
   const { t } = useLanguage()
+
+  const handleOAuth = async (provider: "google" | "linkedin_oidc") => {
+    setError("")
+    setLoading(true)
+    const { error: oauthError } = await signInWithOAuth(provider)
+    if (oauthError) {
+      setError(oauthError.message)
+      setLoading(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -68,6 +78,38 @@ export default function Login() {
             <CardDescription>{t("login_desc")}</CardDescription>
           </CardHeader>
           <CardContent>
+            <div className="space-y-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                size="lg"
+                disabled={loading}
+                onClick={() => handleOAuth("google")}
+              >
+                Continue with Google
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                size="lg"
+                disabled={loading}
+                onClick={() => handleOAuth("linkedin_oidc")}
+              >
+                Continue with LinkedIn
+              </Button>
+            </div>
+
+            <div className="relative my-5">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-3 text-ink/50">or continue with email</span>
+              </div>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
                 <div className="rounded-2xl border-2 border-destructive/30 bg-destructive/10 p-3 text-sm font-medium text-destructive">

@@ -47,11 +47,7 @@ export default function VendorLogin() {
     const { error: err } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}${
-          localStorage.getItem("revwa_vendor_pending_org")
-            ? "/vendor/onboarding-complete"
-            : "/vendor"
-        }`,
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
     })
     if (err) {
